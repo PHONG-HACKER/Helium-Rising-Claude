@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<title>Helium Rising</title>
+<title>Helium Rising V2.0</title>
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0a0d18; }
@@ -23,6 +23,7 @@
   .card {
     background: rgba(10, 16, 32, .64); backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+    position: relative;
     border: 1px solid rgba(255,255,255,.16); border-radius: 22px;
     padding: 26px 28px; max-width: 410px; width: 100%; margin: auto 0; flex: none;
     box-shadow: 0 24px 60px rgba(0,0,0,.45);
@@ -88,6 +89,15 @@
     width: 15px; height: 15px; border-radius: 50%; background: #fff;
     border: 2px solid #0a1020; box-shadow: 0 2px 6px rgba(0,0,0,.45);
   }
+
+  #restartBtn {
+    position: absolute; top: 14px; right: 256px; width: 40px; height: 40px; padding: 0; z-index: 30;
+    border-radius: 12px; font-size: 18px; line-height: 1;
+    background: rgba(10,16,32,.5); color: #fff;
+    border: 1px solid rgba(255,255,255,.16); box-shadow: 0 10px 26px rgba(0,0,0,.25);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  #restartBtn:hover { transform: none; box-shadow: 0 10px 26px rgba(0,0,0,.25); background: rgba(255,255,255,.14); }
 
   #sound {
     position: absolute; top: 14px; right: 210px; width: 40px; height: 40px; padding: 0; z-index: 30;
@@ -165,6 +175,57 @@
     50% { box-shadow: 0 0 0 11px rgba(201,165,255,0); }
   }
 
+  /* ---- control mode ---- */
+  #ctrlPick {
+    position: absolute; top: 14px; left: 14px; z-index: 30; display: flex; gap: 3px;
+    background: rgba(10,16,32,.5); border: 1px solid rgba(255,255,255,.16);
+    border-radius: 13px; padding: 3px;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  #ctrlPick button {
+    width: auto; padding: 7px 13px; font-size: 12.5px; font-weight: 700; border-radius: 10px;
+    background: transparent; color: rgba(255,255,255,.55); box-shadow: none;
+  }
+  #ctrlPick button:hover { transform: none; box-shadow: none; color: #fff; }
+  #ctrlPick button.on { background: rgba(255,255,255,.18); color: #fff; }
+
+  #stick {
+    position: absolute; left: 18px; bottom: 18px; width: 124px; height: 124px;
+    border-radius: 50%; z-index: 30; touch-action: none;
+    background: radial-gradient(circle at 50% 50%, rgba(10,16,32,.42), rgba(10,16,32,.26));
+    border: 1px solid rgba(255,255,255,.2);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  #stick::after {
+    content: ''; position: absolute; inset: 14px; border-radius: 50%;
+    border: 1px dashed rgba(255,255,255,.14);
+  }
+  #knob {
+    position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px;
+    border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle at 36% 30%, #ffffff, #c3d0e2 60%, #8b9ab0);
+    box-shadow: 0 5px 14px rgba(0,0,0,.45);
+    transition: transform .08s ease-out;
+  }
+
+  body.touchmode #powers {
+    left: auto; right: 14px; bottom: 64px;
+    justify-content: flex-end; max-width: 184px;
+  }
+  body.touchmode #shieldBtn, body.touchmode #slowBtn,
+  body.touchmode #visionBtn, body.touchmode #magnetBtn {
+    min-width: 84px; font-size: 13.5px; padding: 12px 10px; text-align: center;
+  }
+
+  .eventLine {
+    margin: -4px 0 12px; padding: 9px 12px; border-radius: 13px; font-size: 12.5px; line-height: 1.45;
+    background: linear-gradient(135deg, rgba(255,209,102,.16), rgba(255,90,90,.12));
+    border: 1px solid rgba(255,209,102,.34); color: #ffe3a3;
+  }
+  .eventLine b { color: #ffd166; }
+  .eventLine.off { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); color: rgba(255,255,255,.6); }
+  .eventLine.off b { color: rgba(255,255,255,.85); }
+
   /* ---- currency ---- */
   #money {
     position: absolute; right: 14px; bottom: 16px; z-index: 30;
@@ -176,6 +237,39 @@
   }
   #money small { font-size: 11px; color: rgba(255,255,255,.5); font-weight: 600; letter-spacing: .08em; }
 
+  /* ---- save / load ---- */
+  #saveBtns { position: absolute; left: 14px; bottom: 16px; z-index: 30; display: flex; gap: 8px; }
+  .sbtn {
+    width: auto; padding: 9px 14px; border-radius: 14px;
+    font-size: 14px; font-weight: 700; line-height: 1;
+    color: #d9e6ff; background: rgba(10,16,32,.5);
+    border: 1px solid rgba(160,195,255,.26); box-shadow: none;
+  }
+  .sbtn:hover { background: rgba(26,40,74,.66); transform: none; box-shadow: none; }
+  .codeBox {
+    display: block; width: 100%; box-sizing: border-box; height: 132px; resize: vertical;
+    background: rgba(0,0,0,.34); color: #cfe3ff; border: 1px solid rgba(255,255,255,.2);
+    border-radius: 12px; padding: 10px 12px; margin: 0 0 8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11.5px; line-height: 1.5; letter-spacing: .02em; word-break: break-all;
+  }
+  .codeBox:focus { outline: none; border-color: rgba(140,230,168,.5); }
+  .codeInfo { font-size: 12px; color: rgba(255,255,255,.48); margin: 0 0 12px; text-align: left; }
+  .codePrev {
+    text-align: left; font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,.82);
+    background: rgba(126,240,168,.1); border: 1px solid rgba(126,240,168,.3);
+    border-radius: 12px; padding: 10px 12px; margin: 12px 0;
+  }
+  .codePrev b { color: #8ce6a8; }
+  button.danger { background: linear-gradient(180deg, #ffb36b, #ff7a59); color: #2b1405; }
+  button.danger { margin-bottom: 10px; }
+
+  @media (max-width: 520px) {
+    #saveBtns { left: 10px; bottom: 12px; gap: 6px; }
+    .sbtn { padding: 8px 11px; font-size: 13px; }
+    .codeBox { height: 116px; font-size: 11px; }
+  }
+
   /* ---- secondary button ---- */
   .btn2 {
     background: rgba(255,255,255,.1); color: #fff;
@@ -186,7 +280,7 @@
   .row2 { display: flex; gap: 10px; margin-top: 10px; }
 
   /* ---- shop ---- */
-  #shop .card { max-width: 470px; }
+  #shop .card { max-width: 520px; }
   .bal { font-size: 13.5px; color: rgba(255,255,255,.7); margin: -6px 0 14px; }
   .bal b { color: #ffd966; font-size: 17px; }
   .item {
@@ -204,11 +298,80 @@
     white-space: nowrap; box-shadow: none;
   }
   .item .buy:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-  .item .pin {
+  .pin {
     width: 76px; margin-bottom: 6px; display: block;
     background: rgba(0,0,0,.35); color: #ffd966; font: inherit; font-size: 13px;
     border: 1px solid rgba(255,214,120,.4); border-radius: 9px; padding: 5px 7px;
   }
+  .cardBack {
+    position: absolute; top: 13px; left: 13px; z-index: 2;
+    width: 38px; height: 38px; padding: 0; border-radius: 50%;
+    font-size: 19px; line-height: 1; font-weight: 700;
+    color: #fff; background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.18); box-shadow: none;
+  }
+  .cardBack:hover { background: rgba(255,255,255,.2); transform: none; box-shadow: none; }
+
+  .twoCol { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
+  .twoCol .colHead {
+    font-size: 11px; letter-spacing: .11em; text-transform: uppercase; font-weight: 700;
+    color: rgba(255,255,255,.55); margin: 14px 2px 8px; text-align: left;
+  }
+  .mini {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 13px; padding: 9px 8px 8px; margin-bottom: 7px; text-align: center;
+  }
+  .mini img { display: block; margin: 0 auto 5px; }
+  .mini .nm { font-size: 12.5px; font-weight: 700; line-height: 1.25; }
+  .mini .rar { display: inline-block; margin: 4px 0 0; font-size: 9px; padding: 2px 6px; vertical-align: 0; }
+  .mini .buy { width: 100%; padding: 7px 4px; font-size: 11.5px; margin-top: 7px; border-radius: 9px; }
+  .mini.locked { opacity: .45; }
+  @media (max-width: 560px) {
+    .twoCol { grid-template-columns: 1fr; }
+    .capsule { flex-direction: column; align-items: stretch; text-align: center; gap: 8px; }
+    .capsule .odds { text-align: center; }
+    .capsule .buy { width: 100%; }
+  }
+
+  #questBox {
+    position: absolute; top: 58px; left: 14px; z-index: 30; width: 232px;
+    text-align: left; padding: 9px 11px 10px; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(126,240,168,.17), rgba(90,200,255,.13));
+    border: 1px solid rgba(126,240,168,.36);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  #questBox .qtitle { font-size: 12.5px; font-weight: 800; color: #d8ffe8; }
+  #questBox .qtitle span {
+    font-size: 9px; font-weight: 800; letter-spacing: .1em; color: #7ef0a8;
+    background: rgba(126,240,168,.2); padding: 2px 5px; border-radius: 5px; margin-left: 5px;
+  }
+  #questBox .qinfo { font-size: 10.5px; color: rgba(255,255,255,.68); line-height: 1.35; margin-top: 4px; }
+  #questBox .btn2 { width: 100%; padding: 6px; font-size: 12px; margin-top: 7px; border-radius: 9px; }
+  @media (max-width: 520px) {
+    #questBox { top: 50px; left: 10px; width: 182px; padding: 7px 9px 8px; }
+    #questBox .qtitle { font-size: 11px; }
+    #questBox .qtitle span { display: none; }
+    #questBox .qinfo { font-size: 9.5px; }
+  }
+  .qbar { height: 7px; border-radius: 4px; background: rgba(255,255,255,.14); margin-top: 7px; overflow: hidden; }
+  .qbar i { display: block; height: 100%; border-radius: 4px;
+            background: linear-gradient(90deg, #7ef0a8, #6fd4ff); }
+
+  .navBtn {
+    display: flex; align-items: center; gap: 13px; width: 100%; text-align: left;
+    padding: 15px 16px; margin-bottom: 10px; border-radius: 17px; cursor: pointer;
+    color: #fff; background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.14); box-shadow: none;
+    font: inherit;
+  }
+  .navBtn:hover { background: rgba(255,255,255,.14); transform: translateY(-1px); box-shadow: none; }
+  .navBtn .ic { font-size: 27px; width: 36px; text-align: center; flex: none; }
+  .navBtn .tx { flex: 1; min-width: 0; }
+  .navBtn .tx b { display: block; font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
+  .navBtn .tx i { display: block; font-style: normal; font-size: 12px; color: rgba(255,255,255,.58); margin-top: 2px; line-height: 1.35; }
+  .navBtn .ch { font-size: 22px; color: rgba(255,255,255,.35); flex: none; }
+  .navBtn.locked .ic { filter: grayscale(1); opacity: .6; }
+
   .sect {
     text-align: left; font-size: 11px; letter-spacing: .11em; text-transform: uppercase;
     color: rgba(255,255,255,.5); margin: 16px 2px 8px; font-weight: 700;
@@ -256,7 +419,8 @@
     background: linear-gradient(135deg, rgba(201,165,255,.18), rgba(111,212,255,.14));
     border: 1px solid rgba(201,165,255,.35); border-radius: 16px; padding: 13px 14px; margin-bottom: 10px;
   }
-  .capsule .cap { font-size: 30px; }
+  .capsule .cap { font-size: 30px; flex: none; }
+  .capsule .main { flex: 1; min-width: 0; }
   .capsule .main .nm { font-size: 15px; font-weight: 800; }
   .capsule .odds { font-size: 11px; color: rgba(255,255,255,.6); line-height: 1.45; margin-top: 3px; }
   .capsule .buy { white-space: nowrap; }
@@ -324,6 +488,7 @@
     #money { right: 10px; bottom: 12px; font-size: 13px; padding: 8px 11px; }
     #panel { width: 150px; top: 10px; right: 10px; }
     #sound { right: 170px; top: 10px; width: 34px; height: 34px; font-size: 15px; }
+    #restartBtn { right: 210px; top: 10px; width: 34px; height: 34px; font-size: 15px; }
     h1 { font-size: 27px; }
   }
 </style>
@@ -332,6 +497,26 @@
 <div id="wrap">
   <canvas id="c"></canvas>
 
+  <div id="ctrlPick">
+    <button id="pickKb" class="on">⌨ Keyboard</button>
+    <button id="pickTouch">📱 Mobile</button>
+  </div>
+
+  <div id="questBox" class="hidden">
+    <div class="qtitle">🛸 Space Quest <span>LIMITED</span></div>
+    <div class="qbar"><i id="qFill"></i></div>
+    <div class="qinfo" id="qInfo"></div>
+    <button class="btn2 hidden" id="qClaim">Claim the Alien Scout</button>
+  </div>
+
+  <div id="saveBtns" class="hidden">
+    <button class="sbtn" id="saveBtn" title="Show your save code">💾 Save</button>
+    <button class="sbtn" id="loadBtn" title="Paste a save code">📂 Load</button>
+  </div>
+
+  <div id="stick" class="hidden"><div id="knob"></div></div>
+
+  <button id="restartBtn" class="hidden" title="End the run and go back to the start screen (R)">↻</button>
   <button id="sound" title="Mute / unmute (M)">🔊</button>
   <div id="powers">
     <button id="shieldBtn" title="Activate bubble shield (/ key)">🫧 Shield</button>
@@ -352,12 +537,20 @@
     <div class="card">
       <h1>🎈 Helium Rising</h1>
       <p class="sub">Your balloon never stops climbing. Dodge what the sky throws at you and bank every metre you earn — anything you collect is saved for your next flight.</p>
-      <div class="keys">
+      <div class="keys" id="keysKb">
         <div class="keyrow"><kbd>←</kbd><kbd>→</kbd> <span>steer</span> <kbd>↑</kbd> <span>boost</span> <kbd>↓</kbd> <span>vent</span></div>
         <div class="keyrow"><kbd>/</kbd> <span>shield</span> <kbd>.</kbd> <span>slow-mo</span> <kbd>,</kbd> <span>vision</span> <kbd>;</kbd> <span>magnet</span></div>
-        <div class="keyrow"><kbd>[</kbd><kbd>]</kbd> <span>boost speed</span> <kbd>M</kbd> <span>mute</span> <span>· or drag to steer</span></div>
-        <div class="keyrow"><span>3 🫧 → 5s shield &nbsp;·&nbsp; 5 ⏱ → 10s slow &nbsp;·&nbsp; 🔮 from the shop</span></div>
+        <div class="keyrow"><kbd>[</kbd><kbd>]</kbd> <span>boost speed</span> <kbd>M</kbd> <span>mute</span> <kbd>P</kbd> <span>pause</span> <kbd>R</kbd> <span>end&nbsp;run</span></div>
+        <div class="keyrow"><span>3 🫧 → 5s shield &nbsp;·&nbsp; 5 ⏱ → 10s slow &nbsp;·&nbsp; 🔮 🧲 from the shop</span></div>
       </div>
+      <div class="keys hidden" id="keysTouch">
+        <div class="keyrow"><span>🕹 Drag the stick, bottom left — sideways to steer, up to boost, down to vent</span></div>
+        <div class="keyrow"><span>Tap a power-up button on the right to fire it</span></div>
+        <div class="keyrow"><span>Set your climb speed with the Boost slider, top right</span></div>
+        <div class="keyrow"><span>↻ at the top ends the run · 🔊 mutes</span></div>
+        <div class="keyrow"><span>3 🫧 → 5s shield &nbsp;·&nbsp; 5 ⏱ → 10s slow &nbsp;·&nbsp; 🔮 🧲 from the shop</span></div>
+      </div>
+      <div class="eventLine off" id="eventMenu"></div>
       <div class="best" id="menuBest"></div>
       <button id="playBtn">Launch</button>
       <div class="who">Playing as <b id="whoName">Player 1</b><b id="whoTitle" style="color:#ffd966"></b></div>
@@ -422,17 +615,50 @@
     </div>
   </div>
 
+  <div class="layer hidden" id="saveLayer">
+    <div class="card">
+      <button class="cardBack" id="saveBack" title="Back">←</button>
+      <h2>💾 Save code</h2>
+      <p class="sub">This is <b id="saveWho">your</b> whole account in one code — meters, high score, skins,
+        trails, titles, power-ups and records. The game already saves on its own; keep this somewhere safe in case
+        it ever doesn't, or to carry your account to another computer.</p>
+      <textarea id="saveCode" class="codeBox" readonly spellcheck="false"></textarea>
+      <div class="codeInfo" id="saveInfo"></div>
+      <div class="row2">
+        <button class="btn2" id="copyCode">📋 Copy code</button>
+        <button class="btn2" id="dlCode">⬇ Save to file</button>
+      </div>
+      <div class="best" id="saveMsg"></div>
+    </div>
+  </div>
+
+  <div class="layer hidden" id="loadLayer">
+    <div class="card">
+      <button class="cardBack" id="loadBack" title="Back">←</button>
+      <h2>📂 Load code</h2>
+      <p class="sub">Paste a save code below. It is loaded into the account you are playing as right now and
+        replaces everything in it — so switch to the right player first, or make a new one.</p>
+      <textarea id="loadCode" class="codeBox" spellcheck="false" autocomplete="off"
+                placeholder="Paste your HR1. code here"></textarea>
+      <div class="row2">
+        <button class="btn2" id="pasteCode">📥 Paste</button>
+        <button class="btn2" id="checkCode">Check code</button>
+      </div>
+      <div id="loadPreview" class="codePrev hidden"></div>
+      <button id="applyCode" class="hidden danger">Overwrite this account</button>
+      <div class="best" id="loadMsg"></div>
+    </div>
+  </div>
+
   <div class="layer hidden" id="shop">
     <div class="card">
-      <h2>🛒 Shop</h2>
-      <p class="sub">Every metre you climb is banked when a run ends. Spend it on power-ups that are waiting in your next flight.</p>
+      <button class="cardBack" id="shopBack" title="Back">←</button>
+      <h2 id="shopTitle">🛒 Shop</h2>
+      <p class="sub" id="shopSub">Every metre you climb is banked when a run ends. Spend it on power-ups that are waiting in your next flight.</p>
       <div class="bal">Balance: <b id="shopBal">0 m</b></div>
+      <div class="eventLine off" id="eventShop"></div>
       <div id="adminFlag" class="adminOn hidden">ADMIN MODE — prices are editable</div>
       <div id="shopItems"></div>
-      <div class="row2">
-        <button class="btn2" id="adminBtn">ADMIN</button>
-        <button id="shopClose">Done</button>
-      </div>
       <div id="adminSet" class="hidden">
         <div class="sect">Admin — set what you own</div>
         <div class="setRow"><label>👤 Player name</label><input id="setName" type="text" maxlength="14" autocomplete="off"></div>
@@ -449,9 +675,18 @@
         <div class="row2">
           <button class="btn2" id="trailAll">Unlock all trails</button>
         </div>
+        <div class="sect">Test mode</div>
+        <div class="row2">
+          <button class="btn2" id="testToggle">Test mode: OFF</button>
+          <button class="btn2" id="warpBoss">Jump to the boss</button>
+        </div>
+        <div class="ds" style="text-align:left;margin:-2px 2px 4px">Never die, so you can study the boss and the high zones. Press <b>B</b> in flight to warp to 3,000 m.</div>
         <div class="sect" id="scoreHead">Past high scores</div>
         <div class="scores" id="scoreList"></div>
-        <div class="row2"><button class="btn2" id="clearScores">Clear history</button></div>
+        <div class="row2">
+          <button class="btn2" id="clearScores">Clear history</button>
+          <button class="btn2" id="adminBtn">🔒 Lock admin</button>
+        </div>
       </div>
 
       <div id="adminBox" class="hidden">
@@ -731,6 +966,26 @@
       this.tone({ f0: 150, f1: 900, dur: 0.5, vol: 0.14, type: 'sawtooth' });
       this.burst({ dur: 0.45, f0: 240, f1: 1900, vol: 0.12, type: 'lowpass', q: 0.7 });
     },
+    bossIn() {
+      this.tone({ f0: 70, f1: 150, dur: 2.2, vol: .16, type: 'sawtooth' });
+      [0, .5, 1, 1.5].forEach((d, i) =>
+        this.tone({ f0: 420 - i * 40, f1: 300 - i * 30, dur: .5, vol: .09, type: 'sine', delay: d }));
+    },
+    bossShoot() { this.burst({ dur: .45, f0: 1400, f1: 220, vol: .16, type: 'bandpass', q: 1.2 }); },
+    turretGet() {
+      this.tone({ f0: 520, f1: 980, dur: .14, vol: .14, type: 'square' });
+      this.tone({ f0: 1200, dur: .1, vol: .07, type: 'triangle', delay: .08 });
+    },
+    bossHit() {
+      this.burst({ dur: .5, f0: 900, f1: 120, vol: .3, type: 'lowpass', q: .6 });
+      this.tone({ f0: 180, f1: 70, dur: .4, vol: .16, type: 'square' });
+    },
+    bossDie() {
+      this.burst({ dur: 1.6, f0: 700, f1: 60, vol: .42, type: 'lowpass', q: .5, rate: .6 });
+      this.tone({ f0: 120, f1: 35, dur: 1.5, vol: .2, type: 'sawtooth' });
+      [0, .18, .36, .6].forEach((d, i) =>
+        this.burst({ dur: .5, f0: 1600 - i * 300, f1: 90, vol: .22, type: 'bandpass', delay: d }));
+    },
     magnetOn() {
       this.tone({ f0: 160, f1: 520, dur: 0.45, vol: 0.14, type: 'sawtooth' });
       this.tone({ f0: 320, f1: 1040, dur: 0.4, vol: 0.07, type: 'square', delay: 0.05 });
@@ -791,8 +1046,16 @@
   const keys = Object.create(null);
   window.addEventListener('keydown', e => {
     const k = e.key.toLowerCase();
+    if (!document.getElementById('saveLayer').classList.contains('hidden')) {
+      if (k === 'escape') document.getElementById('saveLayer').classList.add('hidden');
+      return;                       // the code box owns the keyboard while it is open
+    }
+    if (!document.getElementById('loadLayer').classList.contains('hidden')) {
+      if (k === 'escape') document.getElementById('loadLayer').classList.add('hidden');
+      return;
+    }
     if (!document.getElementById('shop').classList.contains('hidden')) {
-      if (k === 'escape') closeShop();
+      if (k === 'escape') shopStepBack();
       return;                       // let the shop scroll with the keyboard
     }
     if (!document.getElementById('players').classList.contains('hidden')) {
@@ -815,17 +1078,78 @@
     if (k === ',') activateVision();
     if (k === 'p' || k === 'escape') togglePause();
     if (k === ';') activateMagnet();
+    if (k === 'b' && testMode && state === 'playing') warpToBoss();
+    if (k === 'r' && state === 'playing') restartRun();
     if (k === '[') setBoost(boostMax - 0.2);
     if (k === ']') setBoost(boostMax + 0.2);
-    if (state === 'over' && (k === 'enter' || k === ' ' || k === 'r')) start();
+    if (state === 'over' && (k === 'enter' || k === ' ')) start();
     if (state === 'menu' && (k === 'enter' || k === ' ')) start();
   });
   window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+  // ---------- control mode ----------
+  let ctrlMode = rawGet('heliumCtrl', '') ||
+                 (('ontouchstart' in window) && Math.min(screen.width, screen.height) < 820 ? 'touch' : 'kb');
+  const stickEl = document.getElementById('stick');
+  const knobEl = document.getElementById('knob');
+  const stick = { active: false, x: 0, y: 0, id: null };
+  const STICK_R = 42;
+
+  function setCtrlMode(m) {
+    ctrlMode = m;
+    rawSet('heliumCtrl', m);
+    document.body.classList.toggle('touchmode', m === 'touch');
+    document.getElementById('pickKb').classList.toggle('on', m === 'kb');
+    document.getElementById('pickTouch').classList.toggle('on', m === 'touch');
+    document.getElementById('keysKb').classList.toggle('hidden', m === 'touch');
+    document.getElementById('keysTouch').classList.toggle('hidden', m !== 'touch');
+    syncStick();
+  }
+  function syncStick() {
+    const rb = document.getElementById('restartBtn');
+    if (rb) rb.classList.toggle('hidden', state !== 'playing');
+    stickEl.classList.toggle('hidden', !(ctrlMode === 'touch' && state === 'playing'));
+    if (stickEl.classList.contains('hidden')) releaseStick();
+    const pick = document.getElementById('ctrlPick');
+    if (pick) pick.classList.toggle('hidden', state === 'playing');
+    updateQuestBox();
+    updateSaveBtns();
+  }
+  function releaseStick() {
+    stick.active = false; stick.x = 0; stick.y = 0; stick.id = null;
+    knobEl.style.transform = 'translate(0px,0px)';
+  }
+  function moveStick(e) {
+    const r = stickEl.getBoundingClientRect();
+    let dx = e.clientX - (r.left + r.width / 2);
+    let dy = e.clientY - (r.top + r.height / 2);
+    const d = Math.hypot(dx, dy);
+    if (d > STICK_R) { dx *= STICK_R / d; dy *= STICK_R / d; }
+    stick.x = dx / STICK_R; stick.y = dy / STICK_R;
+    knobEl.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px)';
+  }
+  stickEl.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    stick.active = true; stick.id = e.pointerId;
+    stickEl.setPointerCapture(e.pointerId);
+    moveStick(e);
+  });
+  stickEl.addEventListener('pointermove', e => { if (stick.active && e.pointerId === stick.id) moveStick(e); });
+  const endStick = e => { if (!stick.active || e.pointerId === stick.id) releaseStick(); };
+  stickEl.addEventListener('pointerup', endStick);
+  stickEl.addEventListener('pointercancel', endStick);
+
+  document.getElementById('qClaim').addEventListener('click', () => {
+    if (grantAlienSkin(false)) { Snd.init(); Snd.timeReady(); updateQuestBox(); }
+  });
+  document.getElementById('pickKb').addEventListener('click', () => { setCtrlMode('kb'); Snd.init(); Snd.click(); });
+  document.getElementById('pickTouch').addEventListener('click', () => { setCtrlMode('touch'); Snd.init(); Snd.click(); });
 
   const pointer = { active: false, x: 0, y: 0 };
   const grab = e => { pointer.x = e.clientX; pointer.y = e.clientY; };
   cvs.addEventListener('pointerdown', e => {
     if (paused) { togglePause(false); return; }
+    if (ctrlMode === 'touch') return;                 // the joystick drives instead
     pointer.active = true; grab(e); cvs.setPointerCapture(e.pointerId);
   });
   cvs.addEventListener('pointermove', e => { if (pointer.active) grab(e); });
@@ -903,18 +1227,105 @@
     Snd.mute(soundOn);
     paintSound();
   }
+  document.getElementById('restartBtn').addEventListener('click', e => {
+    restartRun(); e.currentTarget.blur();
+  });
   soundBtn.addEventListener('click', () => { Snd.init(); toggleSound(); soundBtn.blur(); });
   paintSound();
   Snd.on = soundOn;
 
   // ================= ECONOMY / SHOP =================
+  // ---------- Space Quest: a limited window ----------
+  const QUEST_FROM = new Date(2026, 9, 16).getTime();     // 16 Oct 2026, 00:00
+  const QUEST_TO = new Date(2026, 9, 25).getTime();       // through the end of the 24th
+  const QUEST_GOAL = 5;
+  const questOpen = () => { const n = Date.now(); return n >= QUEST_FROM && n < QUEST_TO; };
+  const questLeft = () => QUEST_TO - Date.now();
+
+  // ---------- Admin Abuse: every Saturday ----------
+  const EVENT_DAY = 6;                       // 0 = Sunday
+  const eventOn = () => new Date().getDay() === EVENT_DAY;
+  const priceOf = v => Math.round(v * (eventOn() ? .5 : 1));
+
+  function eventCountdown() {
+    const now = new Date();
+    if (eventOn()) {
+      const end = new Date(now); end.setHours(24, 0, 0, 0);
+      return { active: true, ms: end - now };
+    }
+    const d = new Date(now); d.setHours(0, 0, 0, 0);
+    let days = (EVENT_DAY - d.getDay() + 7) % 7;
+    if (days === 0) days = 7;
+    d.setDate(d.getDate() + days);
+    return { active: false, ms: d - now };
+  }
+  function fmtDur(ms) {
+    const s = Math.max(0, Math.floor(ms / 1000));
+    const dd = (s / 86400) | 0, hh = ((s % 86400) / 3600) | 0, mm = ((s % 3600) / 60) | 0, ss = s % 60;
+    return dd ? dd + 'd ' + hh + 'h ' + mm + 'm' : hh ? hh + 'h ' + mm + 'm ' + ss + 's' : mm + 'm ' + ss + 's';
+  }
+
   const DEFAULT_PRICES = { shield: 1000, slow: 1500, vision: 2500, magnet: 1200, gacha: 1500 };
 
   let stats = { deaths: 0, runs: 0, smashes: 0, shards: 0, clocks: 0, pulls: 0,
-                meters: 0, noPower: 0, legendary: 0, mythic: 0, known: [] };
+                meters: 0, noPower: 0, legendary: 0, mythic: 0, bossWins: 0, bossKills: 0, known: [] };
   try { const st = JSON.parse(store.get('heliumStats', 'null')); if (st) Object.assign(stats, st); } catch (e) {}
   if (!Array.isArray(stats.known)) stats.known = [];
   function saveStats() { store.set('heliumStats', JSON.stringify(stats)); }
+
+  // a profile named "test" gets kitted out once, then behaves like any other save
+  const isTestAccount = () => currentName().trim().toLowerCase() === 'test';
+  function questDone() { return (stats.bossKills || 0) >= QUEST_GOAL; }
+  function hasAlienSkin() { return inv.skins.indexOf('alienship') >= 0; }
+
+  function grantAlienSkin(announce) {
+    if (hasAlienSkin()) return false;
+    inv.skins.push('alienship');
+    if (inv.bought.indexOf('alienship') < 0) inv.bought.push('alienship');
+    inv.skin = 'alienship';
+    saveInv();
+    if (announce) {
+      showBanner('ALIEN SCOUT', 'Five motherships down — the salvaged ship is yours', '#8bffc6', 4.4);
+      Snd.init();
+      [0, .12, .24, .4].forEach((d, i) =>
+        Snd.tone({ f0: 392 * Math.pow(1.26, i), dur: .6, vol: .14, type: 'sine', delay: d }));
+    }
+    return true;
+  }
+
+  function grantTestAccount() {
+    if (!isTestAccount() || store.get('heliumTestGranted', '0') === '1') return;
+    store.set('heliumTestGranted', '1');
+    bank = Math.max(bank, 999999);
+    inv.shields = Math.max(inv.shields || 0, 9);
+    inv.slows = Math.max(inv.slows || 0, 9);
+    inv.visions = Math.max(inv.visions || 0, 9);
+    inv.magnets = Math.max(inv.magnets || 0, 9);
+    inv.adminTitle = 1;
+    SKINS.forEach(k => {
+      if (inv.skins.indexOf(k.id) < 0) inv.skins.push(k.id);
+      if (inv.bought.indexOf(k.id) < 0) inv.bought.push(k.id);
+    });
+    TRAILS.forEach(tr => { if (inv.trails.indexOf(tr.id) < 0) inv.trails.push(tr.id); });
+    stats.deaths = Math.max(stats.deaths, 100);
+    stats.runs = Math.max(stats.runs, 100);
+    stats.smashes = Math.max(stats.smashes, 50);
+    stats.shards = Math.max(stats.shards, 100);
+    stats.clocks = Math.max(stats.clocks, 100);
+    stats.pulls = Math.max(stats.pulls, 25);
+    stats.meters = Math.max(stats.meters, 100000);
+    stats.noPower = Math.max(stats.noPower, 300);
+    stats.legendary = 1; stats.mythic = 1; stats.bossWins = 1;
+    stats.bossKills = Math.max(stats.bossKills || 0, QUEST_GOAL);
+    best = Math.max(best, 1700);
+    adminOn = true;
+    store.set('heliumAdmin', '1');
+    store.set('heliumBest', String(best));
+    saveBank(); saveInv(); saveStats();
+    checkNewTitles();
+    testMode = true;
+    store.set('heliumTest', '1');
+  }
 
   // progress-based titles you wear next to your name
   const TITLES = [
@@ -937,6 +1348,8 @@
       at: () => inv.skins.filter(id => { const k = skinOf(id); return k && !k.hidden; }).length },
     { id: 'spacer',   nm: 'Spacefarer',    ds: 'Reach 1,700 m — actual space.',    goal: () => 1700,   at: () => best },
     { id: 'mythic',   nm: 'Mythbound',     ds: 'Pull a mythic trail.',             goal: () => 1,      at: () => stats.mythic },
+    { id: 'slayer',   nm: 'ALIEN SLAYER',   ds: 'Shoot down the mothership at 3,000 m.', goal: () => 1,
+      at: () => (stats.bossWins ? 1 : 0), col: '#7ef0a8' },
     { id: 'admin',    nm: 'ADMIN',          ds: 'Unlocked with a secret code.',     goal: () => 1,
       at: () => (inv.adminTitle ? 1 : 0), secret: true, col: '#ff3b3b' }
   ];
@@ -1062,6 +1475,13 @@
       ds: 'Admin only. Fire-feathered, with two burning wings.',
       css: 'radial-gradient(circle at 34% 28%, #fff3c0, #ff7a1f 52%, #6b1600)' },
 
+    { id: 'alienship', nm: 'Alien Scout', price: 0, hidden: true, hue: 150, tie: '#8bd6a8',
+      tex: 'ufoskin', dome: true, beam: true, sx: 1.34, sy: .68,
+      glow: true, glowCol: '#86ffc0', aura: [130, 255, 190],
+      c: ['#dfe9ee', '#8aa0ab', '#39474f'],
+      ds: 'Limited. Salvaged from five downed motherships.',
+      css: 'radial-gradient(circle at 34% 28%, #dfe9ee, #8aa0ab 55%, #39474f)' },
+
     { id: 'thunderball', nm: 'Thunder', price: 0, hidden: true, hue: 228, tie: '#ffd84a',
       tex: 'thunderskin', cuteFace: true, bolt: true,
       glow: true, glowCol: '#8fc0ff', aura: [150, 195, 255],
@@ -1091,6 +1511,7 @@
   if (inv.trail && inv.trails.indexOf(inv.trail) < 0) inv.trail = null;   // you start with no trail
   const skinOf = id => SKINS.find(k => k.id === id) || SKINS[0];
   let adminOn = store.get('heliumAdmin', '0') === '1';
+  let testMode = store.get('heliumTest', '0') === '1';
   let scores = [];
   try { const sc = JSON.parse(store.get('heliumScores', 'null')); if (Array.isArray(sc)) scores = sc; } catch (e) {}
   function saveScores() { store.set('heliumScores', JSON.stringify(scores.slice(0, 60))); }
@@ -1107,7 +1528,42 @@
 
   const fmt = n => Math.max(0, Math.round(n)).toLocaleString('en-US');
   const moneyVal = document.getElementById('moneyVal');
-  function updateMoney() { moneyVal.textContent = fmt(bank); }
+  function updateMoney() { moneyVal.textContent = fmt(bank) + (eventOn() ? ' ×2' : ''); }
+
+  function updateQuestBox() {
+    const box = document.getElementById('questBox');
+    if (!box) return;
+    const owned = hasAlienSkin();
+    const show = (questOpen() || owned) && state !== 'playing';
+    box.classList.toggle('hidden', !show);
+    if (!show) return;
+
+    const got = Math.min(stats.bossKills || 0, QUEST_GOAL);
+    document.getElementById('qFill').style.width = (got / QUEST_GOAL * 100) + '%';
+    document.getElementById('qInfo').innerHTML = owned
+      ? '<b>Earned</b> — the Alien Scout is in your skins.<br>' + got + ' / ' + QUEST_GOAL + ' motherships'
+      : '<b>' + got + ' / ' + QUEST_GOAL + '</b> motherships destroyed<br>' +
+        (questOpen() ? 'ends in ' + fmtDur(questLeft()) + ' · 16–24 Oct' : 'closed');
+    document.getElementById('qClaim').classList.toggle('hidden',
+      !(questOpen() && !owned && got >= QUEST_GOAL));
+  }
+
+  function updateEventUI() {
+    const c = eventCountdown();
+    const live = '🛡️ <b>ADMIN ABUSE IS LIVE</b> — ×2 meters · ×4 luck · half price<br>' +
+                 fmtDur(c.ms) + ' left';
+    const soon = '🛡️ <b>ADMIN ABUSE</b> — ×2 meters · ×4 luck · half price<br>' +
+                 'unlocks in ' + fmtDur(c.ms);
+    ['eventMenu', 'eventShop'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = c.active ? live : soon;
+      el.classList.toggle('off', !c.active);
+    });
+    updateMoney();
+    updateQuestBox();
+  }
+  setInterval(updateEventUI, 1000);
   function saveBank() { store.set('heliumBank', String(Math.round(bank))); updateMoney(); }
   function saveInv() { store.set('heliumInv', JSON.stringify(inv)); }
   function savePrices() { store.set('heliumPrices', JSON.stringify(prices)); }
@@ -1132,57 +1588,57 @@
   const adminBtn = document.getElementById('adminBtn');
   let shopFrom = 'menu';
 
-  function renderShop() {
-    shopBalEl.textContent = fmt(bank) + ' m';
-    adminFlag.classList.toggle('hidden', !adminOn);
-    adminBtn.textContent = adminOn ? 'ADMIN ✓' : 'ADMIN';
-    document.getElementById('adminSet').classList.toggle('hidden', !adminOn);
-    if (adminOn) {
-      document.getElementById('setBank').value = Math.round(bank);
-      document.getElementById('setShields').value = inv.shields || 0;
-      document.getElementById('setSlows').value = inv.slows || 0;
-      document.getElementById('setVisions').value = inv.visions || 0;
-      document.getElementById('setMagnets').value = inv.magnets || 0;
-      document.getElementById('setBest').value = best;
-      document.getElementById('setName').value = currentName();
-      const top = scores.slice().sort((a, b) => b.a - a.a).slice(0, 12);
-      const listEl = document.getElementById('scoreList');
-      document.getElementById('scoreHead').textContent =
-        'Hi-score history' + (scores.length ? ' — ' + scores.length + ' record' + (scores.length === 1 ? '' : 's') + ' set' : '');
-      listEl.innerHTML = top.length
-        ? top.map((r, i) => '<div class="scoreRow r' + (i + 1) + '"><span class="rk">#' + (i + 1) + '</span>' +
-            '<span class="al">' + fmt(r.a) + ' m</span>' +
-            '<span class="dt">' + (r.p ? 'beat ' + fmt(r.p) + ' m · ' : 'first record · ') + shortDate(r.t) + '</span></div>').join('')
-        : '<div class="scoreEmpty">No records yet — your first flight sets one.</div>';
+  let shopPage = 'hub';
 
-      const ta = document.getElementById('trailAll');
-      ta.textContent = inv.trails.length >= TRAILS.length ? '↩ Lock all trails' : 'Unlock all trails';
-      const sa = document.getElementById('skinAll');
-      const allUnlocked = inv.skins.length >= SKINS.length;
-      const canUndo = allUnlocked && inv.bought.length < SKINS.length;
-      sa.textContent = canUndo ? '↩ Undo unlock' : 'Unlock all skins';
-      sa.disabled = allUnlocked && !canUndo;
-    }
-    shopItemsEl.innerHTML = SHOP_ITEMS.map(it => {
-      const price = prices[it.key];
+  const PAGE_META = {
+    hub:       { t: '🛒 Shop',            d: 'Every metre you climb is banked when a run ends. Spend it here.' },
+    titles:    { t: '🏅 Titles',          d: 'Earn them by flying. Wear one beside your name.' },
+    cosmetics: { t: '🎈 Trails & Skins',  d: 'Open capsules for trails, buy balloon skins, and redeem secret codes.' },
+    admin:     { t: '🛡️ Admin',           d: 'Prices, inventory, records — behind a code.' }
+  };
+
+  function powerupsHtml() {
+    return '<div class="sect">Power-ups</div>' + SHOP_ITEMS.map(it => {
+      const full = prices[it.key], price = priceOf(full);
       const owned = inv[it.inv] || 0;
-      const afford = bank >= price;
       return '<div class="item">' +
         '<div class="ico">' + it.ico + '</div>' +
         '<div class="main"><div class="nm">' + it.nm +
           (owned ? '<span class="own">owned ' + owned + '</span>' : '') + '</div>' +
           '<div class="ds">' + it.ds + '</div></div>' +
         '<div>' +
-          (adminOn ? '<input class="pin" type="number" min="0" step="50" value="' + price +
+          (adminOn ? '<input class="pin" type="number" min="0" step="50" value="' + full +
                      '" data-price="' + it.key + '" aria-label="price">' : '') +
-          '<button class="buy" data-buy="' + it.key + '"' + (afford ? '' : ' disabled') + '>' +
-            fmt(price) + ' m</button>' +
+          '<button class="buy" data-buy="' + it.key + '"' + (bank >= price ? '' : ' disabled') + '>' +
+            (eventOn() ? '<s style="opacity:.5">' + fmt(full) + '</s> ' : '') + fmt(price) + ' m</button>' +
         '</div></div>';
     }).join('');
+  }
 
-    const price = prices.gacha;
-    const oddsLine = Object.keys(RARITY).map(k => RARITY[k].nm + ' ' + RARITY[k].odds + '%').join(' · ');
-    shopItemsEl.innerHTML += '<div class="sect">Titles</div>' + TITLES.map(tt => {
+  function hubHtml() {
+    const titlesGot = TITLES.filter(titleDone).length;
+    const worn = currentTitle();
+    const trailsGot = inv.trails.length, skinsGot = inv.skins.length;
+    const nav = (page, ic, name, sub, locked) =>
+      '<button class="navBtn' + (locked ? ' locked' : '') + '" data-page="' + page + '">' +
+        '<span class="ic">' + ic + '</span>' +
+        '<span class="tx"><b>' + name + '</b><i>' + sub + '</i></span>' +
+        '<span class="ch">›</span></button>';
+
+    return nav('titles', '🏅', 'Titles',
+               titlesGot + ' of ' + TITLES.length + ' unlocked' +
+               (worn.id === 'rookie' ? '' : ' · wearing ' + worn.nm)) +
+           nav('cosmetics', '🎈', 'Trails &amp; Skins',
+               trailsGot + ' trail' + (trailsGot === 1 ? '' : 's') + ' · ' +
+               skinsGot + ' skin' + (skinsGot === 1 ? '' : 's') + ' · redeem codes here') +
+           nav('admin', '🛡️', 'Admin',
+               adminOn ? 'Unlocked — set prices, inventory and records' : 'Locked — enter the code',
+               !adminOn) +
+           powerupsHtml();
+  }
+
+  function titlesHtml() {
+    return TITLES.map(tt => {
       const done = titleDone(tt), worn = (inv.title || 'rookie') === tt.id;
       const prog = Math.min(tt.at(), tt.goal());
       const tail = done ? '' : (tt.secret ? ' — needs a code' : ' — ' + fmt(prog) + ' / ' + fmt(tt.goal()));
@@ -1194,58 +1650,135 @@
           : done ? '<button class="buy eq" data-title="' + tt.id + '">Wear</button>'
                  : '<button class="buy" disabled>Locked</button>') +
         '</div>';
-    }).join('') +
+    }).join('');
+  }
+
+  function cosmeticsHtml() {
+    const fullGacha = prices.gacha, price = priceOf(fullGacha);
+    const oddsLine = Object.keys(RARITY).map(k => RARITY[k].nm + ' ' + RARITY[k].odds + '%').join(' · ');
+
+    let h = '<div class="sect">Redeem a code</div>' +
       '<div class="newRow"><input id="titleCode" maxlength="20" placeholder="Secret code" ' +
       'autocomplete="off" spellcheck="false"><button class="btn2" id="titleCodeGo">Redeem</button></div>' +
       '<div id="titleCodeMsg" class="best"></div>';
 
-    shopItemsEl.innerHTML += '<div class="sect">Trail capsule</div>' +
+    h += '<div class="sect">Trail capsule</div>' +
       '<div class="capsule"><div class="cap">🎁</div>' +
       '<div class="main"><div class="nm">Open a capsule</div>' +
-      '<div class="odds">' + oddsLine + ' — 11.5% empty (part refund)<br>' +
+      '<div class="odds">' + (eventOn()
+        ? '<b style="color:#ffd166">ADMIN ABUSE — ×4 luck, half price</b><br>Admin 2% · Mythic 12% · Legendary 20% · Epic 30% · Rare 25% · Common 9% · 2% empty<br>'
+        : oddsLine + ' — 11.5% empty (part refund)<br>') +
       'Trails cannot be bought. ' + (inv.pulls || 0) + ' opened so far.</div></div>' +
-      (adminOn ? '<input class="pin" type="number" min="0" step="50" value="' + price + '" data-price="gacha">' : '') +
-      '<div style="display:flex;flex-direction:column;gap:6px">' +
+      '<div style="display:flex;flex-direction:column;gap:6px;align-items:stretch">' +
+        (adminOn ? '<input class="pin" type="number" min="0" step="50" value="' + fullGacha +
+                   '" data-price="gacha" style="width:100%;margin:0">' : '') +
         '<button class="buy" data-pull="1"' + (bank >= price ? '' : ' disabled') + '>' + fmt(price) + ' m</button>' +
         '<button class="buy" data-pull="10"' + (bank >= price * 10 ? '' : ' disabled') + '>×10 — ' + fmt(price * 10) + ' m</button>' +
       '</div></div>';
 
-    shopItemsEl.innerHTML += '<div class="sect">Trails</div>' +
-      '<div class="item"><div class="trailImg"></div>' +
-      '<div class="main"><div class="nm">No trail</div><div class="ds">Fly clean.</div></div>' +
+    const trailCol = '<div class="colHead">Trails</div>' +
+      '<div class="mini"><div class="trailImg" style="margin:0 auto 5px"></div>' +
+      '<div class="nm">No trail</div>' +
       (inv.trail ? '<button class="buy eq" data-trail="">Equip</button>'
                  : '<button class="buy eqd" disabled>Equipped ✓</button>') + '</div>' +
       TRAILS.map(tr => {
         const owned = inv.trails.indexOf(tr.id) >= 0;
         const worn = inv.trail === tr.id;
         const rr = RARITY[tr.r];
-        return '<div class="item' + (owned ? '' : ' locked') + '">' +
+        return '<div class="mini' + (owned ? '' : ' locked') + '" title="' +
+            (owned ? tr.ds : 'Found in capsules.') + '">' +
           '<img class="trailImg" src="' + trailThumb(tr) + '" alt="">' +
-          '<div class="main"><div class="nm">' + (owned ? tr.nm : '???') +
-            '<span class="rar" style="background:' + rr.col + '33;color:' + rr.col + '">' + rr.nm + '</span></div>' +
-            '<div class="ds">' + (owned ? tr.ds : 'Found in capsules.') + '</div></div>' +
+          '<div class="nm">' + (owned ? tr.nm : '???') + '</div>' +
+          '<span class="rar" style="background:' + rr.col + '33;color:' + rr.col + '">' + rr.nm + '</span>' +
           (worn ? '<button class="buy eqd" disabled>Equipped ✓</button>'
                 : owned ? '<button class="buy eq" data-trail="' + tr.id + '">Equip</button>'
                         : '<button class="buy" disabled>Locked</button>') +
           '</div>';
       }).join('');
 
-    shopItemsEl.innerHTML += '<div class="sect">Balloon skins</div>' + SKINS.filter(sk =>
-      !sk.hidden || inv.skins.indexOf(sk.id) >= 0).map(sk => {
-      const owned = inv.skins.indexOf(sk.id) >= 0;
-      const worn = inv.skin === sk.id;
-      const afford = bank >= sk.price;
-      const btn = worn
-        ? '<button class="buy eqd" disabled>Equipped ✓</button>'
-        : owned
-          ? '<button class="buy eq" data-equip="' + sk.id + '">Equip</button>'
-          : '<button class="buy" data-skin="' + sk.id + '"' + (afford ? '' : ' disabled') + '>' +
-            (sk.price ? fmt(sk.price) + ' m' : 'Free') + '</button>';
-      return '<div class="item">' +
-        '<img class="sw" src="' + skinThumb(sk) + '" alt="">' +
-        '<div class="main"><div class="nm">' + sk.nm + '</div><div class="ds">' + sk.ds + '</div></div>' +
-        btn + '</div>';
-    }).join('');
+    const skinCol = '<div class="colHead">Balloon skins</div>' +
+      SKINS.filter(sk => !sk.hidden || inv.skins.indexOf(sk.id) >= 0).map(sk => {
+        const owned = inv.skins.indexOf(sk.id) >= 0;
+        const worn = inv.skin === sk.id;
+        const btn = worn
+          ? '<button class="buy eqd" disabled>Equipped ✓</button>'
+          : owned
+            ? '<button class="buy eq" data-equip="' + sk.id + '">Equip</button>'
+            : '<button class="buy" data-skin="' + sk.id + '"' + (bank >= priceOf(sk.price) ? '' : ' disabled') + '>' +
+              (sk.price ? fmt(priceOf(sk.price)) + ' m' : 'Free') + '</button>';
+        return '<div class="mini" title="' + sk.ds + '">' +
+          '<img class="sw" src="' + skinThumb(sk) + '" alt="" style="margin:0 auto 5px">' +
+          '<div class="nm">' + sk.nm + '</div>' + btn + '</div>';
+      }).join('');
+
+    h += '<div class="twoCol"><div>' + trailCol + '</div><div>' + skinCol + '</div></div>';
+
+    return h;
+  }
+
+  function goShopPage(page) {
+    shopPage = page;
+    adminMsg.textContent = '';
+    const l = document.getElementById('shop');
+    renderShop();
+    if (l) l.scrollTop = 0;
+    Snd.init(); Snd.click();
+  }
+
+  function renderShop() {
+    shopBalEl.textContent = fmt(bank) + ' m';
+    const meta = PAGE_META[shopPage] || PAGE_META.hub;
+    document.getElementById('shopTitle').textContent = meta.t;
+    document.getElementById('shopSub').textContent = meta.d;
+    document.getElementById('shopBack').title = shopPage === 'hub' ? 'Leave the shop' : 'Back';
+
+    const onAdmin = shopPage === 'admin';
+    adminFlag.classList.toggle('hidden', !(onAdmin && adminOn));
+    document.getElementById('adminSet').classList.toggle('hidden', !(onAdmin && adminOn));
+    adminBox.classList.toggle('hidden', !(onAdmin && !adminOn));
+
+    if (onAdmin && adminOn) {
+      document.getElementById('setBank').value = Math.round(bank);
+      document.getElementById('setShields').value = inv.shields || 0;
+      document.getElementById('setSlows').value = inv.slows || 0;
+      document.getElementById('setVisions').value = inv.visions || 0;
+      document.getElementById('setMagnets').value = inv.magnets || 0;
+      document.getElementById('setBest').value = best;
+      document.getElementById('setName').value = currentName();
+      const top = scores.slice().sort((a, b) => b.a - a.a).slice(0, 12);
+      document.getElementById('scoreHead').textContent =
+        'Hi-score history' + (scores.length ? ' — ' + scores.length + ' record' + (scores.length === 1 ? '' : 's') + ' set' : '');
+      document.getElementById('scoreList').innerHTML = top.length
+        ? top.map((r, i) => '<div class="scoreRow r' + (i + 1) + '"><span class="rk">#' + (i + 1) + '</span>' +
+            '<span class="al">' + fmt(r.a) + ' m</span>' +
+            '<span class="dt">' + (r.p ? 'beat ' + fmt(r.p) + ' m · ' : 'first record · ') + shortDate(r.t) + '</span></div>').join('')
+        : '<div class="scoreEmpty">No records yet — your first flight sets one.</div>';
+
+      document.getElementById('testToggle').textContent = 'Test mode: ' + (testMode ? 'ON' : 'OFF');
+      document.getElementById('testToggle').style.color = testMode ? '#7ef0a8' : '';
+      const ta = document.getElementById('trailAll');
+      ta.textContent = inv.trails.length >= TRAILS.length ? '↩ Lock all trails' : 'Unlock all trails';
+      const sa = document.getElementById('skinAll');
+      const allUnlocked = inv.skins.length >= SKINS.length;
+      const canUndo = allUnlocked && inv.bought.length < SKINS.length;
+      sa.textContent = canUndo ? '↩ Undo unlock' : 'Unlock all skins';
+      sa.disabled = allUnlocked && !canUndo;
+    }
+
+    shopItemsEl.innerHTML = shopPage === 'hub' ? hubHtml()
+                          : shopPage === 'titles' ? titlesHtml()
+                          : shopPage === 'cosmetics' ? cosmeticsHtml()
+                          : '';
+
+    shopItemsEl.querySelectorAll('[data-claim]').forEach(b =>
+      b.addEventListener('click', () => {
+        if (grantAlienSkin(false)) {
+          Snd.init(); Snd.timeReady();
+          renderShop();
+        }
+      }));
+    shopItemsEl.querySelectorAll('[data-page]').forEach(b =>
+      b.addEventListener('click', () => goShopPage(b.getAttribute('data-page'))));
 
     const tcGo = document.getElementById('titleCodeGo');
     if (tcGo) {
@@ -1278,8 +1811,9 @@
   function buySkin(id) {
     const sk = skinOf(id);
     if (inv.skins.indexOf(id) >= 0) return equipSkin(id);
-    if (bank < sk.price) { Snd.init(); Snd.tone({ f0: 220, f1: 140, dur: 0.18, vol: 0.14, type: 'square' }); return; }
-    bank -= sk.price;
+    const skPrice = priceOf(sk.price);
+    if (bank < skPrice) { Snd.init(); Snd.tone({ f0: 220, f1: 140, dur: 0.18, vol: 0.14, type: 'square' }); return; }
+    bank -= skPrice;
     inv.skins.push(id);
     if (inv.bought.indexOf(id) < 0) inv.bought.push(id);
     inv.skin = id;
@@ -1297,7 +1831,7 @@
   function buyItem(key) {
     const it = SHOP_ITEMS.find(i => i.key === key);
     if (!it) return;
-    const price = prices[key];
+    const price = priceOf(prices[key]);
     if (bank < price) { Snd.init(); Snd.tone({ f0: 220, f1: 140, dur: 0.18, vol: 0.14, type: 'square' }); return; }
     bank -= price;
     inv[it.inv] = (inv[it.inv] || 0) + 1;
@@ -1308,6 +1842,15 @@
 
   function rollRarity() {
     const r = Math.random() * 100;          // exactly the published odds; the remainder is an empty capsule
+    if (eventOn()) {                        // Admin Abuse: the good tiers go up roughly four-fold
+      if (r < 2) return 'admin';
+      if (r < 14) return 'mythic';
+      if (r < 34) return 'legendary';
+      if (r < 64) return 'epic';
+      if (r < 89) return 'rare';
+      if (r < 98) return 'common';
+      return null;
+    }
     if (r < 0.5) return 'admin';
     if (r < 3.5) return 'mythic';
     if (r < 8.5) return 'legendary';
@@ -1343,7 +1886,7 @@
   }
 
   function pullCapsule() {
-    const price = prices.gacha;
+    const price = priceOf(prices.gacha);
     if (bank < price) { Snd.init(); Snd.tone({ f0: 220, f1: 140, dur: .18, vol: .14, type: 'square' }); return; }
     bank -= price;
     const result = openOne(price, true);
@@ -1353,11 +1896,12 @@
   }
 
   function pullTen() {
-    const price = prices.gacha * 10;
+    const unit = priceOf(prices.gacha);
+    const price = unit * 10;
     if (bank < price) { Snd.init(); Snd.tone({ f0: 220, f1: 140, dur: .18, vol: .14, type: 'square' }); return; }
     bank -= price;
     const results = [];
-    for (let i = 0; i < 10; i++) results.push(openOne(prices.gacha, false));
+    for (let i = 0; i < 10; i++) results.push(openOne(unit, false));
 
     // wear the rarest thing that was actually new
     let bestNew = null;
@@ -1559,6 +2103,7 @@
 
   function openShop(from) {
     shopFrom = from;
+    shopPage = 'hub';
     document.getElementById('menu').classList.add('hidden');
     document.getElementById('over').classList.add('hidden');
     adminBox.classList.add('hidden');
@@ -1697,31 +2242,29 @@
 
   document.getElementById('shopBtn').addEventListener('click', () => openShop('menu'));
   document.getElementById('shopBtn2').addEventListener('click', () => openShop('over'));
-  document.getElementById('shopClose').addEventListener('click', closeShop);
+  function shopStepBack() {
+    if (shopPage !== 'hub') goShopPage('hub');
+    else closeShop();
+  }
+  document.getElementById('shopBack').addEventListener('click', shopStepBack);
   document.getElementById('revealOk').addEventListener('click', closeReveal);
   document.getElementById('reel10Ok').addEventListener('click', closeReveal10);
 
   adminBtn.addEventListener('click', () => {
-    if (adminOn) {
-      adminOn = false; store.set('heliumAdmin', '0');
-      adminMsg.textContent = 'Admin mode locked.';
-      adminMsg.className = '';
-      adminBox.classList.add('hidden');
-      renderShop();
-      return;
-    }
-    adminBox.classList.toggle('hidden');
-    adminMsg.textContent = '';
-    if (!adminBox.classList.contains('hidden')) document.getElementById('adminCode').focus();
+    adminOn = false;
+    store.set('heliumAdmin', '0');
+    adminMsg.textContent = 'Admin mode locked.';
+    adminMsg.className = '';
+    Snd.init(); Snd.click();
+    renderShop();
   });
 
   function tryAdmin() {
     const input = document.getElementById('adminCode');
     if (input.value.trim() === ADMIN_CODE) {
       adminOn = true; store.set('heliumAdmin', '1');
-      adminMsg.textContent = 'Unlocked — edit any price below.';
+      adminMsg.textContent = 'Unlocked — set prices, inventory and records below.';
       adminMsg.className = 'ok';
-      adminBox.classList.add('hidden');
       input.value = '';
       Snd.init(); Snd.timeReady();
       renderShop();
@@ -1748,6 +2291,7 @@
       }
       me.name = newName;
       saveProfiles();
+      grantTestAccount();
       paintWho();
       renamed = ' You are now ' + newName + '.';
     }
@@ -1786,6 +2330,26 @@
     }
     renderShop();
   });
+  function warpToBoss() {
+    if (state !== 'playing') { adminMsg.textContent = 'Launch a run first, then press B.'; adminMsg.className = 'bad'; return; }
+    balloon.y = Math.max(balloon.y, BOSS_ALT - 500);
+    cam.y = balloon.y;
+    obstacles = []; forecast = []; bossRocks = []; turrets = [];
+    Snd.init(); Snd.click();
+    adminMsg.textContent = 'Warped — the mothership is just above.';
+    adminMsg.className = 'ok';
+  }
+  document.getElementById('warpBoss').addEventListener('click', warpToBoss);
+
+  document.getElementById('testToggle').addEventListener('click', () => {
+    testMode = !testMode;
+    store.set('heliumTest', testMode ? '1' : '0');
+    Snd.init(); Snd.click();
+    adminMsg.textContent = testMode ? 'Test mode on — you cannot die.' : 'Test mode off.';
+    adminMsg.className = testMode ? 'ok' : '';
+    renderShop();
+  });
+
   document.getElementById('trailAll').addEventListener('click', () => {
     const all = inv.trails.length >= TRAILS.length;
     inv.trails = all ? [] : TRAILS.map(tr => tr.id);
@@ -1841,7 +2405,16 @@
   let visions, visionT, forecast;
   let magnets, magnetT;
   let trail, deathCam, deathPos, usedPower;
+  let boss, bossDone, bossShots, bossRocks, turrets, bossBanner;
+  let bannerTxt = '', bannerSub = '', bannerCol = '#7ef0a8', bannerMax = 4.2;
+  function showBanner(txt, sub, col, secs) {
+    bannerTxt = txt; bannerSub = sub; bannerCol = col || '#7ef0a8';
+    bannerMax = secs || 4.2; bossBanner = bannerMax;
+  }
+  const BOSS_ALT = 30000;            // 3,000 m on the readout
   let weather, rainDrops, weatherToast;
+  let toastMsg = '', toastT = 0;
+  function showToast(msg, secs) { toastMsg = msg; toastT = secs || 2.4; }
 
   const WEATHERS = [
     { id: 'clear',    nm: 'Clear skies',  w: 4 },
@@ -1887,6 +2460,7 @@
     visions = inv.visions || 0; visionT = 0; forecast = [];
     magnets = inv.magnets || 0; magnetT = 0;
     trail = []; deathCam = 0; deathPos = null; usedPower = false;
+    boss = null; bossDone = false; bossShots = []; bossRocks = []; turrets = []; bossBanner = 0;
     weather = rollWeather();
     try {                                   // ?w=rain / sunset / aurora / overcast / clear
       const wq = new URLSearchParams(location.search).get('w');
@@ -2134,6 +2708,159 @@
                        life: rand(.3, .8), max: .8, r: rand(2, 5), hue: rand(185, 215) });
   }
 
+  // ================= ALIEN BOSS =================
+  const bossScreenY = () => H * .2;
+  const bossHalfW = () => Math.min(132, W * .29);
+
+  function startBoss() {
+    boss = { x: W / 2, vx: 62, hp: 5, maxHp: 5, t: 0, enter: 1.8,
+             shootIn: 2.6, charge: null, turretIn: 1.2, hit: 0, dying: 0 };
+    forecast = [];
+    Snd.bossIn();
+    bossBanner = 0;
+  }
+
+  function spawnTurret() {
+    const x = clamp(balloon.x + rand(-250, 250), 40, W - 40);
+    const y = balloon.y + rand(150, 360);          // drops in above you
+    turrets.push({ x: x, y: y, vx: rand(-14, 14), vy: 0, t: rand(0, 6.3), life: 11 });
+  }
+
+  function fireAtBoss(x, y) {
+    bossShots.push({ x: x, y: y, vy: 880 });
+    Snd.turretGet();
+  }
+
+  function damageBoss() {
+    boss.hp--;
+    boss.hit = .4;
+    shake = Math.max(shake, 12);
+    Snd.bossHit();
+    for (let i = 0; i < 26; i++) {
+      const a = Math.random() * 6.2832;
+      particles.push({ x: boss.x, y: cam.y + (H * .64 - bossScreenY()),
+                       vx: Math.cos(a) * rand(80, 300), vy: Math.sin(a) * rand(80, 300),
+                       life: rand(.4, .9), max: .9, r: rand(2, 5), hue: rand(95, 150) });
+    }
+    if (boss.hp <= 0) {
+      boss.dying = 1.9;
+      Snd.bossDie();
+      stats.bossWins = 1;
+      stats.bossKills = (stats.bossKills || 0) + 1;
+      saveStats();
+      const fresh = checkNewTitles();
+      if (fresh.length) newTitles = newTitles.concat(fresh);
+      showBanner('ALIEN SLAYER', 'Mothership destroyed — ' + stats.bossKills + ' down', '#7ef0a8', 4.2);
+      if (questOpen() && questDone() && !hasAlienSkin())
+        setTimeout(() => grantAlienSkin(true), 2600);
+    }
+  }
+
+  function updateBoss(dt) {
+    const bossWY = cam.y + (H * .64 - bossScreenY());        // world y of the ship
+
+    // shots travelling up from collected turrets
+    for (const sh of bossShots) {
+      sh.y += sh.vy * dt;
+      if (sh.y >= bossWY - 14 && boss && boss.dying <= 0 && boss.enter <= 0) { sh.dead = 1; damageBoss(); }
+      else if (sy(sh.y) < -40) sh.dead = 1;
+    }
+    bossShots = bossShots.filter(sh => !sh.dead);
+
+    if (!boss) return;
+    boss.t += dt;
+    boss.hit = Math.max(0, boss.hit - dt);
+
+    if (boss.enter > 0) { boss.enter -= dt; return; }
+
+    if (boss.dying > 0) {
+      boss.dying -= dt;
+      if (Math.random() < dt * 18) {
+        const a = Math.random() * 6.2832, rr = rand(0, 90);
+        particles.push({ x: boss.x + Math.cos(a) * rr, y: bossWY + Math.sin(a) * rr * .5,
+                         vx: Math.cos(a) * rand(60, 260), vy: Math.sin(a) * rand(60, 260),
+                         life: rand(.4, 1), max: 1, r: rand(2, 6), hue: rand(30, 70) });
+      }
+      shake = Math.max(shake, 5);
+      if (boss.dying <= 0) { boss = null; bossDone = true; bossRocks = []; turrets = []; }
+      return;
+    }
+
+    // drift, turning back at the edges
+    boss.x += boss.vx * dt;
+    const edge = bossHalfW() * .92;
+    if (boss.x < edge) { boss.x = edge; boss.vx = Math.abs(boss.vx); }
+    if (boss.x > W - edge) { boss.x = W - edge; boss.vx = -Math.abs(boss.vx); }
+    boss.vx += Math.sin(boss.t * .7) * 10 * dt;
+
+    // charge, then drop a meteor where the balloon was
+    const rate = [0, 1.2, 1.55, 1.9, 2.2, 2.5][boss.hp] || 2.5;
+    if (!boss.charge) {
+      boss.shootIn -= dt;
+      if (boss.shootIn <= 0) { boss.charge = { x: balloon.x, t: .95 }; }
+    } else {
+      boss.charge.t -= dt;
+      boss.charge.x = lerp(boss.charge.x, balloon.x, 1 - Math.pow(.2, dt));
+      if (boss.charge.t <= 0) {
+        bossRocks.push({ x: boss.charge.x, y: bossWY - 20, vy: -360, vx: rand(-25, 25), t: 0 });
+        Snd.bossShoot();
+        boss.charge = null;
+        boss.shootIn = rate * rand(.8, 1.2);
+      }
+    }
+
+    boss.turretIn -= dt;
+    if (boss.turretIn <= 0 && turrets.length < 4) { spawnTurret(); boss.turretIn = rand(2, 3.1); }
+  }
+
+  function updateBossStuff(dt) {
+    for (const r of bossRocks) {
+      r.t += dt;
+      r.y += r.vy * dt; r.x += r.vx * dt;
+      r.vy -= 150 * dt;
+      const d = Math.hypot(balloon.x - r.x, sy(balloon.y) - sy(r.y));
+      if (d < balloon.r * .72 + 15) {
+        if (shieldT > 0) {
+          r.dead = 1;
+          stats.smashes++;
+          Snd.smash();
+          for (let i = 0; i < 14; i++)
+            particles.push({ x: r.x, y: r.y, vx: rand(-200, 200), vy: rand(-200, 200),
+                             life: rand(.3, .7), max: .7, r: rand(2, 4), hue: rand(20, 45) });
+        } else die('meteor');
+      }
+      if (sy(r.y) > H + 80) r.dead = 1;
+    }
+    bossRocks = bossRocks.filter(r => !r.dead);
+
+    for (const tu of turrets) {
+      tu.t += dt;
+      tu.life -= dt;
+      const d = Math.hypot(balloon.x - tu.x, sy(balloon.y) - sy(tu.y));
+
+      const range = magnetT > 0 ? 4000 : 165;
+      if (d < range && d > .001) {                 // leans your way when you get near
+        const ux = (balloon.x - tu.x) / d, uy = (balloon.y - tu.y) / d;
+        const pull = magnetT > 0 ? 520 : 22 + (165 - d) * .4;
+        const ease = magnetT > 0 ? .006 : .22;
+        tu.vx = lerp(tu.vx, ux * pull, 1 - Math.pow(ease, dt));
+        tu.vy = lerp(tu.vy, balloon.vy + uy * pull, 1 - Math.pow(ease, dt));
+        tu.homing = 1;
+      } else {
+        tu.vy = lerp(tu.vy, -40, 1 - Math.pow(.4, dt));     // sinks, so it comes down to you
+        tu.homing = 0;
+      }
+      tu.x += tu.vx * dt; tu.y += tu.vy * dt;
+      if (magnetT <= 0) tu.x = clamp(tu.x, 24, W - 24);
+
+      if (d < balloon.r + 24) { tu.dead = 1; fireAtBoss(tu.x, tu.y); }
+      if (tu.life <= 0 || sy(tu.y) > H + 120) tu.dead = 1;
+    }
+    turrets = turrets.filter(tu => !tu.dead);
+
+    if (bossBanner > 0) bossBanner -= dt;
+  }
+
   // ---------- collision ----------
   function hits(o) {
     if (o.harmless) return false;
@@ -2187,7 +2914,26 @@
     meteor: ['A meteor. Unlucky.', 'Rock from space, zero warning.']
   };
 
+  // everything that happens when a run ends, whether you crashed or restarted
+  function bankRun() {
+    const alt = Math.floor(balloon.y / 10);
+    const prevBest = best;
+    if (alt > best) {                     // only a beaten record goes in the book
+      best = alt;
+      store.set('heliumBest', String(best));
+      recordScore(alt, prevBest);
+    }
+    const paid = eventOn() ? alt * 2 : alt;
+    bank += paid; saveBank();
+    stats.deaths++; stats.runs++; stats.meters += paid;
+    if (!usedPower) stats.noPower = Math.max(stats.noPower, alt);
+    saveStats();
+    newTitles = checkNewTitles();
+    return alt;
+  }
+
   function die(cause) {
+    if (testMode) return;                 // test mode: nothing can pop you
     if (!balloon.alive) return;
     balloon.alive = false;
     state = 'over';
@@ -2199,6 +2945,7 @@
     Snd.set(Snd.wind, 0, 0.3); Snd.set(Snd.boostH, 0, 0.1); Snd.set(Snd.ventH, 0, 0.1);
     Snd.set(Snd.hum, 0, 0.2); shieldT = 0; syncShieldBtn();
     Snd.set(Snd.drone, 0, 0.2); slowT = 0; syncSlowBtn();
+    syncStick();
     visionT = 0; syncVisionBtn();
     magnetT = 0; syncMagnetBtn();
     const psk = skinOf(inv.skin);
@@ -2206,22 +2953,34 @@
       particles.push({ x: balloon.x, y: balloon.y, vx: rand(-260, 260), vy: rand(-260, 260),
                        life: rand(.5, 1.2), max: 1.2, r: rand(2, 6),
                        hue: psk.rainbow ? rand(0, 360) : psk.hue + rand(-14, 14) });
-    const alt = Math.floor(balloon.y / 10);
-    const prevBest = best;
-    if (alt > best) {                     // only a beaten record goes in the book
-      best = alt;
-      store.set('heliumBest', String(best));
-      recordScore(alt, prevBest);
-    }
-    bank += alt; saveBank();
-    stats.deaths++; stats.runs++; stats.meters += alt;
-    if (!usedPower) stats.noPower = Math.max(stats.noPower, alt);
-    saveStats();
-    newTitles = checkNewTitles();
+    const alt = bankRun();
     showOver(alt);
   }
 
   // ================= UPDATE =================
+  function restartRun() {
+    if (state !== 'playing') return;      // counts exactly like dying, then back to the start screen
+    const alt = bankRun();
+    const got = newTitles.slice();
+    Snd.init();
+    Snd.set(Snd.hum, 0, .05); Snd.set(Snd.drone, 0, .05);
+    Snd.set(Snd.boostH, 0, .05); Snd.set(Snd.ventH, 0, .05);
+    Snd.set(Snd.wind, 0, .2);
+    Snd.tone({ f0: 660, f1: 420, dur: .16, vol: .12, type: 'triangle' });
+    paused = false;
+    state = 'menu';
+    overEl.classList.add('hidden');
+    menuEl.classList.remove('hidden');
+    reset();
+    syncStick();
+    if (best > 0) menuBest.textContent = 'Best altitude: ' + best + ' m';
+    updateMoney();
+    updateEventUI();
+    weatherToast = 0;
+    showToast('+' + fmt(eventOn() ? alt * 2 : alt) + ' m banked' + (eventOn() ? ' ×2' : '') +
+              (got.length ? '  ·  🏅 ' + got.join(', ') : ''), 2.4);
+  }
+
   function togglePause(force) {
     if (state !== 'playing') return;
     paused = force === undefined ? !paused : force;
@@ -2244,7 +3003,8 @@
     ctx.fillText('PAUSED', W / 2, H / 2 - 6);
     ctx.font = '600 15px ui-rounded, system-ui, sans-serif';
     ctx.fillStyle = 'rgba(255,255,255,.7)';
-    ctx.fillText('press P or Esc to carry on', W / 2, H / 2 + 24);
+    ctx.fillText(ctrlMode === 'touch' ? 'tap anywhere to carry on' : 'press P or Esc to carry on',
+                 W / 2, H / 2 + 24);
     ctx.restore();
   }
 
@@ -2257,6 +3017,8 @@
       if (deathCam > 0) {
         deathCam = Math.max(0, deathCam - dt);
         for (const o of obstacles) { o.t += sdt; o.x += o.vx * sdt; o.y += o.vy * sdt; }
+        for (const r of bossRocks || []) { r.y += r.vy * sdt; r.x += r.vx * sdt; }
+        for (const tu of turrets || []) { tu.t += sdt; tu.y += tu.vy * sdt; tu.x += tu.vx * sdt; }
         for (const sh of shardList || []) sh.t += sdt;
         for (const ck of clockList || []) ck.t += sdt;
       }
@@ -2278,6 +3040,7 @@
     if (keys['arrowleft'] || keys['a']) ax -= accel;
     if (keys['arrowright'] || keys['d']) ax += accel;
     if (pointer.active) ax += clamp((pointer.x - balloon.x) * 14, -accel, accel);
+    if (stick.active) ax += stick.x * accel * 1.15;
     const wind = Math.sin(alt * 0.0013 + t * 0.35) * (28 + diff * 110);
     ax += wind;
 
@@ -2297,6 +3060,10 @@
     if (pointer.active) {
       const dy = (pointer.y - H * 0.62) / (H * 0.42);
       riseMul = clamp(1 - dy * (boostMax - 1), 0.18, boostMax);
+    }
+    if (stick.active) {
+      riseMul = stick.y < 0 ? 1 + (-stick.y) * (boostMax - 1)
+                            : clamp(1 - stick.y * .85, 0.18, boostMax);
     }
     balloon.riseMul = riseMul;
     balloon.vy = baseRise * riseMul;
@@ -2323,6 +3090,7 @@
 
     // weather
     if (weatherToast > 0) weatherToast -= dt;
+    if (toastT > 0) toastT -= dt;
     if (rainDrops.length) {
       const fall = 1 - clamp((alt - 1800) / 1400, 0, 1);     // rain thins out above the cloud deck
       for (const d of rainDrops) {
@@ -2447,13 +3215,18 @@
     cam.y = lerp(cam.y, balloon.y, 1 - Math.pow(0.0001, dt));
 
     // spawning
-    while (forecast.length < 4) {
+    // the mothership shows up at 3,000 m and normal traffic stops while it is here
+    if (!boss && !bossDone && alt >= BOSS_ALT) startBoss();
+    if (boss || bossShots.length) updateBoss(dt);
+    updateBossStuff(dt);
+    if (boss) { forecast = []; }
+    while (!boss && forecast.length < 4) {
       const last = forecast.length ? forecast[forecast.length - 1].eta : 0;
       const k = pickKind(balloon.y);
       forecast.push({ kind: k, eta: last + lerp(1.15, 0.46, diff) * rand(.78, 1.32), plan: planFor(k) });
     }
     for (const f of forecast) f.eta -= wdt;
-    while (forecast.length && forecast[0].eta <= 0) {
+    while (!boss && forecast.length && forecast[0].eta <= 0) {
       const f = forecast.shift();
       spawnObstacle(f.kind, f.plan);
     }
@@ -3029,6 +3802,31 @@
         break;
       }
 
+      case 'ufoskin': {
+        const hg = ctx.createLinearGradient(0, -ry, 0, ry);
+        hg.addColorStop(0, '#f2f7fa'); hg.addColorStop(.34, '#aebcc4');
+        hg.addColorStop(.62, '#5c6e78'); hg.addColorStop(1, '#222d33');
+        ctx.fillStyle = hg; ctx.fillRect(-rx, -ry, rx * 2, ry * 2);
+
+        ctx.fillStyle = 'rgba(28,38,44,.5)';                 // equator band
+        ctx.beginPath(); ctx.ellipse(0, ry * .2, rx * 1.05, ry * .3, 0, 0, 6.2832); ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255,255,255,.14)'; ctx.lineWidth = 1;
+        for (let i = -3; i <= 3; i++) {                      // hull panel lines
+          ctx.beginPath();
+          ctx.moveTo(i * rx * .3, -ry); ctx.lineTo(i * rx * .36, ry);
+          ctx.stroke();
+        }
+
+        for (let i = 0; i < 9; i++) {                        // rim lights
+          const f = (i + .5) / 9, lx = -rx * .92 + rx * 1.84 * f;
+          const on = Math.sin(t * 4 - i * .7) > -.2 ? 1 : .22;
+          ctx.fillStyle = 'rgba(140,255,190,' + (.95 * on) + ')';
+          ctx.beginPath(); ctx.arc(lx, ry * .34, rx * .045, 0, 6.2832); ctx.fill();
+        }
+        break;
+      }
+
       case 'thunderskin': {
         const sg = ctx.createLinearGradient(0, -ry, 0, ry);
         sg.addColorStop(0, '#c3cdff'); sg.addColorStop(.32, '#5a6ae0');
@@ -3340,6 +4138,48 @@
     ctx.stroke();
   }
 
+  // tractor beam under the saucer
+  function paintBeam(rx, ry) {
+    const pulse = .55 + .45 * Math.sin(t * 3.2);
+    ctx.save();
+    const g = ctx.createLinearGradient(0, ry * .4, 0, ry * 4.6);
+    g.addColorStop(0, 'rgba(150,255,200,' + (.72 * pulse) + ')');
+    g.addColorStop(.45, 'rgba(120,250,185,' + (.34 * pulse) + ')');
+    g.addColorStop(1, 'rgba(110,245,180,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(-rx * .3, ry * .4); ctx.lineTo(rx * .3, ry * .4);
+    ctx.lineTo(rx * 1.05, ry * 4.6); ctx.lineTo(-rx * 1.05, ry * 4.6);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(215,255,235,' + (.4 * pulse) + ')';
+    ctx.lineWidth = 1.8;
+    for (let i = 0; i < 3; i++) {
+      const ph = ((t * .8 + i / 3) % 1);
+      const yy = ry * .4 + ph * ry * 4.2, w = rx * (.3 + ph * .75);
+      ctx.beginPath(); ctx.ellipse(0, yy, w, ry * .12, 0, 0, 6.2832); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // glass dome on the upper hull
+  function paintDome(rx, ry) {
+    ctx.save();
+    const g = ctx.createLinearGradient(0, -ry * 2.2, 0, -ry * .1);
+    g.addColorStop(0, 'rgba(210,255,235,.95)');
+    g.addColorStop(.55, 'rgba(110,215,180,.72)');
+    g.addColorStop(1, 'rgba(40,90,90,.45)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.ellipse(0, -ry * .1, rx * .36, ry * 1.5, 0, Math.PI, 0); ctx.fill();
+    ctx.strokeStyle = 'rgba(220,255,240,.5)'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.ellipse(0, -ry * .1, rx * .36, ry * 1.5, 0, Math.PI, 0); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.45)';
+    ctx.beginPath(); ctx.ellipse(-rx * .13, -ry * .9, rx * .07, ry * .4, -.45, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = 'rgba(60,140,110,.55)';          // little pilot silhouette
+    ctx.beginPath(); ctx.ellipse(0, -ry * .45, rx * .1, ry * .4, 0, 0, 6.2832); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, -ry * .95, rx * .075, 0, 6.2832); ctx.fill();
+    ctx.restore();
+  }
+
   // body + texture + shading, shared by the game and the shop thumbnails
   const stormFlash = () => (Math.sin(t * 2.3) > .86 ? 1 : 0);
 
@@ -3358,6 +4198,7 @@
       ctx.fillStyle = ag;
       ctx.beginPath(); ctx.arc(0, 0, rr, 0, 6.2832); ctx.fill();
     }
+    if (sk.beam && !compact) paintBeam(rx, ry);
     if (sk.tail && !compact) paintTail(rx, ry);
     if (sk.wings) paintWings(rx, ry);
     if (sk.face) paintCrest(rx, ry);
@@ -3408,10 +4249,12 @@
 
     if (sk.face) paintFace(rx, ry);
     if (sk.cuteFace) paintCuteFace(rx, ry);
+    if (sk.dome) paintDome(rx, ry);
   }
 
   let bodyCv = null, bodyKey = '', bodyTtl = 0, bodyRx = 0, bodyRy = 0, bodyPad = 0;
-  const ANIMATED_SKIN = { rainbow: 1, disco: 1, lava: 1, earth: 1, galaxy: 1, phoenixball: 1, thunderball: 1 };
+  const ANIMATED_SKIN = { rainbow: 1, disco: 1, lava: 1, earth: 1, galaxy: 1,
+                          phoenixball: 1, thunderball: 1, alienship: 1 };
 
   // repainting a textured balloon every frame is the single most expensive thing on screen,
   // so it is baked into a sprite and only refreshed when it actually changes
@@ -3422,6 +4265,7 @@
 
     bodyPad = Math.ceil((sk.tail ? Math.max(rx0 * 1.5, ry0 * 2.6)
                         : sk.wings ? rx0 * 1.5
+                        : sk.beam ? Math.max(rx0 * .6, ry0 * 4.8)
                         : sk.bolt ? Math.max(rx0 * 1.4, ry0 * 1.15) : rx0 * .35) + 8);
     bodyRx = rx0; bodyRy = ry0;
     const w = Math.ceil(rx0 * 2 + bodyPad * 2), h = Math.ceil(ry0 * 2 + bodyPad * 2);
@@ -3973,6 +4817,212 @@
     }
   }
 
+  // ---------- alien boss art ----------
+  function drawMothership() {
+    if (!boss) return;
+    const enterOff = boss.enter > 0 ? -(boss.enter / 1.8) * (H * .55) : 0;
+    const x = boss.x, y = bossScreenY() + enterOff + Math.sin(boss.t * 1.1) * 5;
+    const w = bossHalfW(), h = w * .3;
+    const dmg = 1 - boss.hp / boss.maxHp;
+
+    ctx.save();
+    ctx.translate(x, y);
+
+    if (boss.dying > 0) ctx.rotate(Math.sin(boss.dying * 22) * .09);
+
+    // underside beam
+    const beam = ctx.createLinearGradient(0, h * .3, 0, h * 7);
+    beam.addColorStop(0, 'rgba(120,255,190,.28)');
+    beam.addColorStop(1, 'rgba(120,255,190,0)');
+    ctx.fillStyle = beam;
+    ctx.beginPath();
+    ctx.moveTo(-w * .3, h * .3); ctx.lineTo(w * .3, h * .3);
+    ctx.lineTo(w * .95, h * 7); ctx.lineTo(-w * .95, h * 7);
+    ctx.closePath(); ctx.fill();
+
+    // dome
+    const dg = ctx.createLinearGradient(0, -h * 2.1, 0, 0);
+    dg.addColorStop(0, 'rgba(190,255,230,.95)');
+    dg.addColorStop(.6, 'rgba(90,200,170,.7)');
+    dg.addColorStop(1, 'rgba(40,90,90,.5)');
+    ctx.fillStyle = dg;
+    ctx.beginPath(); ctx.ellipse(0, -h * .1, w * .34, h * 1.5, 0, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.35)';
+    ctx.beginPath(); ctx.ellipse(-w * .12, -h * .8, w * .07, h * .35, -.4, 0, 6.2832); ctx.fill();
+
+    // hull
+    const hg = ctx.createLinearGradient(0, -h, 0, h);
+    hg.addColorStop(0, '#9fb3b8'); hg.addColorStop(.45, '#5d7076'); hg.addColorStop(1, '#27343a');
+    ctx.fillStyle = hg;
+    ctx.beginPath(); ctx.ellipse(0, 0, w, h, 0, 0, 6.2832); ctx.fill();
+    ctx.strokeStyle = 'rgba(20,28,32,.6)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(0, 0, w, h, 0, 0, 6.2832); ctx.stroke();
+
+    ctx.fillStyle = 'rgba(30,40,46,.55)';
+    ctx.beginPath(); ctx.ellipse(0, h * .25, w * .82, h * .45, 0, 0, 6.2832); ctx.fill();
+
+    // rim lights
+    for (let i = 0; i < 9; i++) {
+      const f = (i + .5) / 9, lx = -w * .86 + w * 1.72 * f;
+      const on = (Math.sin(boss.t * 4 - i * .7) > -.2) ? 1 : .25;
+      ctx.fillStyle = 'rgba(' + (boss.hp > 2 ? '140,255,190' : '255,170,110') + ',' + (.9 * on) + ')';
+      ctx.beginPath(); ctx.arc(lx, h * .36, 3.4, 0, 6.2832); ctx.fill();
+    }
+
+    // battle damage
+    if (dmg > 0) {
+      ctx.fillStyle = 'rgba(20,16,14,' + (.5 * dmg) + ')';
+      ctx.beginPath(); ctx.ellipse(-w * .4, -h * .1, w * .2 * dmg + 8, h * .5, .3, 0, 6.2832); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(w * .45, h * .05, w * .16 * dmg + 6, h * .4, -.2, 0, 6.2832); ctx.fill();
+      if (Math.random() < .5) {
+        ctx.fillStyle = 'rgba(120,120,130,.25)';
+        ctx.beginPath();
+        ctx.arc(-w * .4 + rand(-10, 10), -h * .6 - (boss.t * 20 % 40), 6 + dmg * 10, 0, 6.2832);
+        ctx.fill();
+      }
+    }
+
+    // charging shot
+    if (boss.charge) {
+      const k = 1 - boss.charge.t / .95;
+      const cg = ctx.createRadialGradient(0, h * .3, 0, 0, h * .3, 34 * k + 6);
+      cg.addColorStop(0, 'rgba(255,220,120,' + (.9 * k) + ')');
+      cg.addColorStop(1, 'rgba(255,120,30,0)');
+      ctx.fillStyle = cg;
+      ctx.beginPath(); ctx.arc(0, h * .3, 34 * k + 6, 0, 6.2832); ctx.fill();
+    }
+
+    if (boss.hit > 0) {
+      ctx.globalAlpha = boss.hit / .4 * .8;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.ellipse(0, 0, w, h * 1.6, 0, 0, 6.2832); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    ctx.restore();
+
+    // targeting line for the shot being charged
+    if (boss.charge) {
+      const k = 1 - boss.charge.t / .95;
+      ctx.save();
+      ctx.globalAlpha = .25 + .5 * k;
+      ctx.strokeStyle = '#ff9a3c';
+      ctx.setLineDash([6, 10]); ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(boss.charge.x, y + h * 2); ctx.lineTo(boss.charge.x, H); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(boss.charge.x, sy(balloon.y), 16 + 10 * (1 - k), 0, 6.2832); ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function drawBossStuff() {
+    for (const r of bossRocks) {
+      const x = r.x, y = sy(r.y);
+      if (y < -60 || y > H + 60) continue;
+      ctx.save();
+      const tg = ctx.createLinearGradient(x, y - 44, x, y);
+      tg.addColorStop(0, 'rgba(255,140,50,0)');
+      tg.addColorStop(1, 'rgba(255,160,60,.5)');
+      ctx.fillStyle = tg;
+      ctx.beginPath(); ctx.moveTo(x - 7, y); ctx.lineTo(x + 7, y); ctx.lineTo(x + 2, y - 46); ctx.lineTo(x - 2, y - 46);
+      ctx.closePath(); ctx.fill();
+      const g = ctx.createRadialGradient(x - 3, y - 3, 2, x, y, 17);
+      g.addColorStop(0, '#fff3c8'); g.addColorStop(.42, '#ff8a3c'); g.addColorStop(1, '#5e2410');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, y, 14, 0, 6.2832); ctx.fill();
+      ctx.restore();
+    }
+
+    for (const tu of turrets) {
+      const x = tu.x, y = sy(tu.y);
+      if (y < -60 || y > H + 60) continue;
+      const pulse = .5 + .5 * Math.sin(tu.t * (tu.homing ? 9 : 4));
+      const fade = tu.life < 2 ? Math.max(.25, Math.abs(Math.sin(tu.life * 9))) : 1;
+      ctx.save();
+      ctx.globalAlpha = fade;
+      const halo = tu.homing ? 40 : 30;
+      const hg = ctx.createRadialGradient(x, y, 2, x, y, halo);
+      hg.addColorStop(0, 'rgba(140,255,190,' + ((tu.homing ? .5 : .35) + pulse * .25) + ')');
+      hg.addColorStop(1, 'rgba(140,255,190,0)');
+      ctx.fillStyle = hg;
+      ctx.beginPath(); ctx.arc(x, y, halo, 0, 6.2832); ctx.fill();
+
+      ctx.translate(x, y);
+      ctx.fillStyle = '#6d7b86';                       // barrel
+      roundRect(-4, -20, 8, 20, 3); ctx.fill();
+      ctx.fillStyle = '#b9ffd8';
+      roundRect(-3, -22, 6, 5, 2); ctx.fill();
+      const bg = ctx.createLinearGradient(0, -6, 0, 12);
+      bg.addColorStop(0, '#8a98a4'); bg.addColorStop(1, '#3b474f');
+      ctx.fillStyle = bg;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = i / 6 * 6.2832 + .52;
+        ctx[i ? 'lineTo' : 'moveTo'](Math.cos(a) * 15, Math.sin(a) * 10 + 2);
+      }
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = 'rgba(20,28,32,.55)'; ctx.lineWidth = 1.4; ctx.stroke();
+      ctx.fillStyle = 'rgba(120,255,190,' + (.55 + pulse * .45) + ')';
+      ctx.beginPath(); ctx.arc(0, 2, 4.2 + pulse, 0, 6.2832); ctx.fill();
+      ctx.restore();
+    }
+
+    for (const sh of bossShots) {
+      const x = sh.x, y = sy(sh.y);
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const g = ctx.createLinearGradient(x, y + 30, x, y - 12);
+      g.addColorStop(0, 'rgba(120,255,190,0)');
+      g.addColorStop(1, 'rgba(200,255,220,.95)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.moveTo(x - 4, y + 30); ctx.lineTo(x + 4, y + 30);
+      ctx.lineTo(x + 2, y - 12); ctx.lineTo(x - 2, y - 12); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#eafff2';
+      ctx.beginPath(); ctx.arc(x, y - 6, 5, 0, 6.2832); ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function drawBossHUD() {
+    if (!boss || boss.enter > 0 || boss.dying > 0) return;
+    const w = Math.min(260, W * .6), x = (W - w) / 2, y = 54;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.font = '800 12px ui-rounded, system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(160,255,200,.9)';
+    ctx.fillText('MOTHERSHIP', W / 2, y - 7);
+    ctx.fillStyle = 'rgba(10,16,32,.5)';
+    roundRect(x - 3, y - 3, w + 6, 16, 8); ctx.fill();
+    for (let i = 0; i < boss.maxHp; i++) {
+      const sw = (w - (boss.maxHp - 1) * 4) / boss.maxHp;
+      ctx.fillStyle = i < boss.hp
+        ? (boss.hp > 2 ? '#7ef0a8' : boss.hp === 2 ? '#ffd166' : '#ff8a6b')
+        : 'rgba(255,255,255,.14)';
+      roundRect(x + i * (sw + 4), y, sw, 10, 5); ctx.fill();
+    }
+    ctx.font = '700 11px ui-rounded, system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,.6)';
+    ctx.fillText(questOpen() && !hasAlienSkin()
+      ? 'SPACE QUEST  ' + Math.min(stats.bossKills || 0, QUEST_GOAL) + ' / ' + QUEST_GOAL + ' motherships'
+      : turrets.length ? 'grab a turret to shoot back' : 'turrets incoming…', W / 2, y + 26);
+    ctx.restore();
+  }
+
+  function drawBossBanner() {
+    if (bossBanner <= 0) return;
+    const a = Math.min(1, bossBanner > bannerMax - .6 ? (bannerMax - bossBanner) / .6 : bossBanner / 1);
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.textAlign = 'center';
+    ctx.font = '800 40px ui-rounded, system-ui, sans-serif';
+    ctx.fillStyle = bannerCol;
+    ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 14;
+    ctx.fillText(bannerTxt, W / 2, H * .36);
+    ctx.font = '700 15px ui-rounded, system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,.85)';
+    ctx.fillText(bannerSub, W / 2, H * .36 + 28);
+    ctx.restore();
+  }
+
   // ---------- HUD ----------
   function drawClimbBar() {
     const bw = Math.min(260, W * 0.55), bh = 9;
@@ -4264,7 +5314,7 @@
     drawShieldHUD();
     drawClimbBar();
     drawPowerCountdowns();
-    if (visionT > 0) drawVisionArrows();
+    if (visionT > 0 && !boss) drawVisionArrows();
   }
 
   // ---------- trail styles ----------
@@ -4738,6 +5788,8 @@
     ctx.globalAlpha = 1;
 
     for (const o of obstacles) drawObstacle(o);
+    if (boss) drawMothership();
+    drawBossStuff();
     if (rainDrops && rainDrops.length) {
       const fade = clamp(1 - (alt - 1800) / 1400, 0, 1);
       if (fade > .02) {
@@ -4794,7 +5846,37 @@
       ctx.restore();
     }
     if (state === 'playing') drawHUD(z, alt);
-    if (weatherToast > 0 && state === 'playing') {
+    if (state === 'playing' && testMode) {
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.font = '800 11px ui-rounded, system-ui, sans-serif';
+      const txt = 'TEST MODE — NO DEATH';
+      const w = ctx.measureText(txt).width + 22;
+      ctx.globalAlpha = .55 + .2 * Math.sin(t * 2.4);
+      ctx.fillStyle = 'rgba(70,12,12,.6)';
+      roundRect(W / 2 - w / 2, 72, w, 22, 11); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,90,90,.5)'; ctx.lineWidth = 1;
+      roundRect(W / 2 - w / 2, 72, w, 22, 11); ctx.stroke();
+      ctx.fillStyle = '#ff9c9c';
+      ctx.fillText(txt, W / 2, 87);
+      ctx.restore();
+    }
+    if (state === 'playing' && boss) drawBossHUD();
+    if (bossBanner > 0) drawBossBanner();
+    if (toastT > 0 && state === 'playing') {
+      const a = Math.min(1, toastT / .6);
+      ctx.save();
+      ctx.globalAlpha = a;
+      ctx.textAlign = 'center';
+      ctx.font = '800 14px ui-rounded, system-ui, sans-serif';
+      const w = ctx.measureText(toastMsg).width + 34;
+      ctx.fillStyle = 'rgba(10,16,32,.55)';
+      roundRect(W / 2 - w / 2, 28, w, 30, 15); ctx.fill();
+      ctx.fillStyle = '#ffd966';
+      ctx.fillText(toastMsg, W / 2, 48);
+      ctx.restore();
+    }
+    if (weatherToast > 0 && toastT <= 0 && state === 'playing') {
       const a = Math.min(1, weatherToast > 3 ? (3.4 - weatherToast) / .4 : weatherToast / .9);
       ctx.save();
       ctx.globalAlpha = a;
@@ -4841,7 +5923,8 @@
   function showOver(alt) {
     document.getElementById('finalAlt').textContent = alt + ' m';
     document.getElementById('bestAlt').textContent = best + ' m';
-    document.getElementById('earnedAlt').textContent = '+' + fmt(alt);
+    document.getElementById('earnedAlt').textContent =
+      '+' + fmt(eventOn() ? alt * 2 : alt) + (eventOn() ? ' ×2' : '');
     const kept = [];
     if (inv.shields) kept.push('🫧 ×' + inv.shields);
     if (inv.slows) kept.push('⏱ ×' + inv.slows);
@@ -4862,6 +5945,261 @@
     setTimeout(() => overEl.classList.remove('hidden'), 1180);
   }
 
+  // ================= SAVE / LOAD CODES =================
+  // One code = one account. It carries meters, high score, every skin / trail / title you own,
+  // what you have equipped, your power-ups, your prices and your past runs.
+  const CODE_TAG = 'HR1.';
+  const STAT_ORDER = ['deaths', 'runs', 'smashes', 'shards', 'clocks', 'pulls',
+                      'meters', 'noPower', 'legendary', 'mythic', 'bossWins', 'bossKills'];
+
+  function fnv(str) {                      // tiny checksum so a mangled code is caught, not loaded
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+    }
+    return h.toString(36);
+  }
+  function maskOf(list, have) {            // a list of ids -> a few base-36 digits
+    const owned = Array.isArray(have) ? have : [], out = [];
+    for (let i = 0; i < list.length; i += 30) {
+      let m = 0;
+      for (let j = 0; j < 30 && i + j < list.length; j++)
+        if (owned.indexOf(list[i + j]) >= 0) m |= 1 << j;
+      out.push(m.toString(36));
+    }
+    return out.join(':');
+  }
+  function unmask(list, str) {
+    const parts = String(str || '').split(':'), out = [];
+    for (let i = 0; i < parts.length; i++) {
+      const m = parseInt(parts[i], 36) || 0;
+      for (let j = 0; j < 30; j++) {
+        const idx = i * 30 + j;
+        if (idx < list.length && (m & (1 << j))) out.push(list[idx]);
+      }
+    }
+    return out;
+  }
+  function toB64(str) {
+    const bytes = new TextEncoder().encode(str);
+    let bin = '';
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function fromB64(code) {
+    let b = code.replace(/-/g, '+').replace(/_/g, '/');
+    while (b.length % 4) b += '=';
+    const bin = atob(b), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  const idsOf = arr => arr.map(x => x.id);
+
+  function snapshot() {
+    const sk = idsOf(SKINS), tr = idsOf(TRAILS), ti = idsOf(TITLES);
+    return {
+      v: 1,
+      n: currentName(),
+      b: Math.max(0, Math.round(bank)),
+      hs: Math.max(0, Math.round(best)),
+      sk: maskOf(sk, inv.skins),
+      bo: maskOf(sk, inv.bought),
+      tr: maskOf(tr, inv.trails),
+      tk: maskOf(ti, stats.known),
+      es: sk.indexOf(inv.skin),
+      et: inv.trail ? tr.indexOf(inv.trail) : -1,
+      eq: ti.indexOf(inv.title),
+      iv: [inv.shields, inv.slows, inv.visions, inv.magnets,
+           inv.shards, inv.clocks, inv.pulls, inv.adminTitle ? 1 : 0].map(n => Math.max(0, n | 0)),
+      st: STAT_ORDER.map(k => Math.max(0, stats[k] | 0)),
+      pr: [prices.shield, prices.slow, prices.vision, prices.magnet, prices.gacha].map(n => n | 0),
+      fl: (adminOn ? 1 : 0) | (testMode ? 2 : 0) | (soundOn ? 4 : 0),
+      bs: Math.round(boostMax * 10),
+      sc: scores.slice(0, 20).map(x => [x.a | 0, Math.round((x.t || 0) / 1000), x.p | 0])
+    };
+  }
+  function makeCode() {
+    const json = JSON.stringify(snapshot());
+    const raw = CODE_TAG + toB64(fnv(json) + '|' + json);
+    return raw.replace(/(.{56})/g, '$1\n');        // wrapped so it is easy to read and select
+  }
+  function parseCode(txt) {
+    const raw = String(txt || '').replace(/\s+/g, '');
+    if (!raw) return { err: 'Paste a code into the box first.' };
+    const at = raw.toUpperCase().indexOf('HR1.');
+    if (at < 0) return { err: 'That is not a Helium Rising code — a real one starts with HR1.' };
+    let plain;
+    try { plain = fromB64(raw.slice(at + 4)); } catch (e) { return { err: 'The code is damaged — characters are missing or changed.' }; }
+    const bar = plain.indexOf('|');
+    if (bar < 0) return { err: 'The code is damaged.' };
+    if (fnv(plain.slice(bar + 1)) !== plain.slice(0, bar))
+      return { err: 'Checksum failed — the code was cut short or edited. Copy the whole thing again.' };
+    let d;
+    try { d = JSON.parse(plain.slice(bar + 1)); } catch (e) { return { err: 'The code is damaged.' }; }
+    if (!d || d.v !== 1) return { err: 'That code came from a different version of the game.' };
+    return { data: d };
+  }
+  function codeSummary(d) {
+    const sk = idsOf(SKINS), tr = idsOf(TRAILS), ti = idsOf(TITLES);
+    const skins = unmask(sk, d.sk), trails = unmask(tr, d.tr), titles = unmask(ti, d.tk);
+    const st = d.st || [], iv = d.iv || [];
+    return '<b>' + escapeHtml(String(d.n || 'Player')) + '</b><br>' +
+      fmt(Math.max(0, d.b | 0)) + ' m banked · best ' + fmt(Math.max(0, d.hs | 0)) + ' m<br>' +
+      skins.length + ' skin' + (skins.length === 1 ? '' : 's') + ' · ' +
+      trails.length + ' trail' + (trails.length === 1 ? '' : 's') + ' · ' +
+      titles.length + ' title' + (titles.length === 1 ? '' : 's') + '<br>' +
+      'wearing ' + escapeHtml(skinOf(sk[d.es] || 'classic').nm) +
+      (d.et >= 0 && tr[d.et] ? ' + ' + escapeHtml((trailOf(tr[d.et]) || {}).nm || 'a trail') : ' · no trail') + '<br>' +
+      '🫧 ' + (iv[0] | 0) + ' · ⏱ ' + (iv[1] | 0) + ' · 🔮 ' + (iv[2] | 0) +
+      ' · 🧲 ' + (iv[3] | 0) + '<br>' +
+      (st[1] | 0) + ' runs · ' + (st[0] | 0) + ' deaths · ' + (st[11] | 0) + ' motherships' +
+      ((d.fl | 0) & 1 ? '<br>⚡ admin mode is on in this code' : '');
+  }
+  function applyCode(d) {
+    const sk = idsOf(SKINS), tr = idsOf(TRAILS), ti = idsOf(TITLES);
+    const skins = unmask(sk, d.sk), bought = unmask(sk, d.bo), trails = unmask(tr, d.tr);
+    if (skins.indexOf('classic') < 0) skins.unshift('classic');
+    if (bought.indexOf('classic') < 0) bought.unshift('classic');
+    const iv = d.iv || [], wantSkin = sk[d.es], wantTrail = d.et >= 0 ? tr[d.et] : null;
+    const nInv = {
+      shields: iv[0] | 0, slows: iv[1] | 0, visions: iv[2] | 0, magnets: iv[3] | 0,
+      shards: iv[4] | 0, clocks: iv[5] | 0, pulls: iv[6] | 0, adminTitle: iv[7] | 0,
+      skins: skins, bought: bought, trails: trails,
+      skin: wantSkin && skins.indexOf(wantSkin) >= 0 ? wantSkin : 'classic',
+      trail: wantTrail && trails.indexOf(wantTrail) >= 0 ? wantTrail : null,
+      title: ti[d.eq] || 'rookie'
+    };
+    const nStats = {};
+    STAT_ORDER.forEach((k, i) => { nStats[k] = (d.st || [])[i] | 0; });
+    nStats.known = unmask(ti, d.tk);
+    if (nStats.known.indexOf('rookie') < 0) nStats.known.unshift('rookie');
+    const pr = d.pr || [], keys = ['shield', 'slow', 'vision', 'magnet', 'gacha'], nPrices = {};
+    keys.forEach((k, i) => { nPrices[k] = pr[i] > 0 ? pr[i] | 0 : DEFAULT_PRICES[k]; });
+
+    store.set('heliumBank', String(Math.max(0, Math.round(Number(d.b) || 0))));
+    store.set('heliumBest', String(Math.max(0, Math.round(Number(d.hs) || 0))));
+    store.set('heliumInv', JSON.stringify(nInv));
+    store.set('heliumStats', JSON.stringify(nStats));
+    store.set('heliumPrices', JSON.stringify(nPrices));
+    store.set('heliumScores', JSON.stringify((d.sc || []).slice(0, 60)
+      .map(x => ({ a: x[0] | 0, t: (x[1] | 0) * 1000, p: x[2] | 0 }))));
+    store.set('heliumAdmin', ((d.fl | 0) & 1) ? '1' : '0');
+    store.set('heliumTest', ((d.fl | 0) & 2) ? '1' : '0');
+    store.set('heliumSound', ((d.fl | 0) & 4) ? '1' : '0');
+    store.set('heliumBoost', String(Math.min(4, Math.max(1.2, (d.bs || 20) / 10))));
+    store.set('heliumTestGranted', '1');   // the code wins; don't re-kit a profile called "test"
+    const prof = profiles.find(x => x.id === currentPid);
+    if (prof && d.n) { prof.name = String(d.n).slice(0, 14) || prof.name; saveProfiles(); }
+    rawSet('heliumLoaded', '1');
+    location.reload();
+  }
+
+  // ---------- panels ----------
+  const saveLayer = document.getElementById('saveLayer');
+  const loadLayer = document.getElementById('loadLayer');
+  const saveCodeEl = document.getElementById('saveCode');
+  const loadCodeEl = document.getElementById('loadCode');
+  const loadPrev = document.getElementById('loadPreview');
+  let pending = null;
+
+  function openSave() {
+    Snd.init(); Snd.click();
+    const code = makeCode();
+    saveCodeEl.value = code;
+    document.getElementById('saveWho').textContent = currentName() + "'s";
+    document.getElementById('saveInfo').textContent =
+      code.replace(/\s+/g, '').length + ' characters · ' + fmt(bank) + ' m · best ' + fmt(best) + ' m';
+    document.getElementById('saveMsg').textContent = '';
+    saveLayer.classList.remove('hidden');
+    setTimeout(() => { saveCodeEl.focus(); saveCodeEl.select(); }, 30);
+  }
+  function openLoad() {
+    Snd.init(); Snd.click();
+    pending = null;
+    loadCodeEl.value = '';
+    loadPrev.classList.add('hidden');
+    document.getElementById('applyCode').classList.add('hidden');
+    document.getElementById('loadMsg').textContent = '';
+    document.getElementById('applyCode').textContent = 'Overwrite ' + currentName();
+    loadLayer.classList.remove('hidden');
+    setTimeout(() => loadCodeEl.focus(), 30);
+  }
+  function checkPasted() {
+    const r = parseCode(loadCodeEl.value);
+    const msg = document.getElementById('loadMsg'), btn = document.getElementById('applyCode');
+    if (r.err) {
+      pending = null;
+      loadPrev.classList.add('hidden'); btn.classList.add('hidden');
+      msg.style.color = '#ff9c9c'; msg.textContent = r.err;
+      Snd.tone({ f0: 300, f1: 180, dur: .18, vol: .12, type: 'square' });
+      return;
+    }
+    pending = r.data;
+    loadPrev.innerHTML = codeSummary(r.data);
+    loadPrev.classList.remove('hidden');
+    btn.textContent = 'Overwrite ' + currentName() + ' with this';
+    btn.classList.remove('hidden');
+    msg.style.color = '#8ce6a8';
+    msg.textContent = 'Code looks good. Loading it replaces everything in this account.';
+    Snd.tone({ f0: 520, f1: 780, dur: .16, vol: .12, type: 'triangle' });
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', openSave);
+  document.getElementById('loadBtn').addEventListener('click', openLoad);
+  document.getElementById('saveBack').addEventListener('click', () => { Snd.click(); saveLayer.classList.add('hidden'); });
+  document.getElementById('loadBack').addEventListener('click', () => { Snd.click(); loadLayer.classList.add('hidden'); });
+  document.getElementById('checkCode').addEventListener('click', checkPasted);
+  loadCodeEl.addEventListener('paste', () => setTimeout(checkPasted, 40));
+
+  document.getElementById('copyCode').addEventListener('click', () => {
+    const msg = document.getElementById('saveMsg');
+    const text = saveCodeEl.value;
+    const done = () => { msg.style.color = '#8ce6a8'; msg.textContent = 'Copied. Paste it somewhere safe.'; Snd.click(); };
+    const fail = () => { msg.style.color = '#ffd966'; msg.textContent = 'Could not reach the clipboard — the code is selected, press Ctrl/⌘ + C.'; };
+    saveCodeEl.focus(); saveCodeEl.select();
+    if (navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(text).then(done, () => { try { document.execCommand('copy') ? done() : fail(); } catch (e) { fail(); } });
+    else { try { document.execCommand('copy') ? done() : fail(); } catch (e) { fail(); } }
+  });
+  document.getElementById('dlCode').addEventListener('click', () => {
+    try {
+      const blob = new Blob([saveCodeEl.value + '\n'], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'helium-rising-' + currentName().replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.txt';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      const msg = document.getElementById('saveMsg');
+      msg.style.color = '#8ce6a8'; msg.textContent = 'Saved to a text file.';
+      Snd.click();
+    } catch (e) {
+      const msg = document.getElementById('saveMsg');
+      msg.style.color = '#ffd966'; msg.textContent = 'This browser would not let the file download — use Copy instead.';
+    }
+  });
+  document.getElementById('pasteCode').addEventListener('click', () => {
+    const msg = document.getElementById('loadMsg');
+    if (navigator.clipboard && navigator.clipboard.readText)
+      navigator.clipboard.readText().then(t => { loadCodeEl.value = t; checkPasted(); },
+        () => { msg.style.color = '#ffd966'; msg.textContent = 'This browser will not hand over the clipboard — click the box and press Ctrl/⌘ + V.'; loadCodeEl.focus(); });
+    else { msg.style.color = '#ffd966'; msg.textContent = 'Click the box and press Ctrl/⌘ + V.'; loadCodeEl.focus(); }
+  });
+  document.getElementById('applyCode').addEventListener('click', () => {
+    if (!pending) return;
+    applyCode(pending);
+  });
+
+  function updateSaveBtns() {
+    const box = document.getElementById('saveBtns');
+    if (!box) return;
+    const busy = ['shop', 'players', 'reveal', 'reveal10', 'saveLayer', 'loadLayer']
+      .some(id => { const el = document.getElementById(id); return el && !el.classList.contains('hidden'); });
+    box.classList.toggle('hidden', state === 'playing' || busy);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.layer'), el =>
+    new MutationObserver(updateSaveBtns).observe(el, { attributes: true, attributeFilter: ['class'] }));
+
   function start() {
     Snd.init(); Snd.mute(soundOn); Snd.click();
     menuEl.classList.add('hidden');
@@ -4869,6 +6207,7 @@
     reset();
     paused = false;
     state = 'playing';
+    syncStick();
     syncShieldBtn(true); syncSlowBtn(true); syncVisionBtn(true); syncMagnetBtn(true);
   }
 
@@ -4881,6 +6220,14 @@
   if (best > 0) menuBest.textContent = 'Best altitude: ' + best + ' m';
   paintWho();
 
+  grantTestAccount();
+  updateSaveBtns();
+  if (rawGet('heliumLoaded', '0') === '1') {
+    rawDel('heliumLoaded');
+    showToast('📂 Save code loaded — welcome back, ' + currentName(), 3.2);
+  }
+  updateEventUI();
+  setCtrlMode(ctrlMode);
   updateMoney();
   reset();
   requestAnimationFrame(frame);
